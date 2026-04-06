@@ -590,6 +590,17 @@ export default function App(){
   // Scraper — source-first, then dynamic filters
   const [scSrc,setScSrc]=useState(null); // selected source before scan
   const [scFilters,setScFilters]=useState({}); // dynamic filters per source
+  const [scQuery,setScQuery]=useState(""); // free-text search query for live APIs
+  const [scShowKeys,setScShowKeys]=useState(false); // show API key config panel
+  // Scraper API keys (stored in localStorage)
+  const [scKeys,setScKeys]=useState(()=>{try{const k=localStorage.getItem("sc_keys");return k?JSON.parse(k):{google:"",yelp:"",cseId:""};}catch{return{google:"",yelp:"",cseId:""};}});
+  const setScKey=(k,v)=>setScKeys(p=>{const n={...p,[k]:v};try{localStorage.setItem("sc_keys",JSON.stringify(n));}catch{}return n;});
+  const hasApiKey=(src)=>{
+    if(src==="google_maps")return!!scKeys.google;
+    if(src==="yelp")return!!scKeys.yelp;
+    if(src==="instagram"||src==="tiktok"||src==="linkedin")return!!scKeys.google&&!!scKeys.cseId;
+    return false;
+  };
   // Email composer
   const [emTab,setEmTab]=useState("template"); // template | compose
   const [emTo,setEmTo]=useState("");
@@ -668,16 +679,51 @@ export default function App(){
   const resetScFilters=()=>setScFilters({});
   const activeFilterCount=Object.values(scFilters).filter(v=>v&&v!=="all").length;
   const selectScSource=(src)=>{setScSrc(src);setScFilters({});setScanRes([]);setScanning(null);};
-  const runScan=()=>{
+  const runScan=async()=>{
     if(!scSrc)return;
     setScanning(scSrc);setScanRes([]);
+    // ── Live API path (when keys configured) ──
+    if(hasApiKey(scSrc)){
+      try{
+        let apiRes;
+        if(scSrc==="google_maps"){
+          const q=scQuery||`${scFilters.bizType==="restaurant"?"restaurants":scFilters.bizType==="retail"?"vintage stores":"businesses"} in ${scFilters.area&&scFilters.area!=="all"?scFilters.area:"Los Angeles"}`;
+          const url=`/api/scrape-google?query=${encodeURIComponent(q)}&minRating=${scFilters.rating?parseFloat(scFilters.rating):0}&maxResults=20`;
+          apiRes=await fetch(url,{headers:{"X-API-Key":scKeys.google}});
+        }else if(scSrc==="yelp"){
+          const term=scQuery||scFilters.bizType==="retail"?"vintage stores":scFilters.bizType==="restaurant"?"restaurants":"businesses";
+          const loc=scFilters.area&&scFilters.area!=="all"?`${scFilters.area}, Los Angeles, CA`:"Los Angeles, CA";
+          const price=scFilters.priceLevel&&scFilters.priceLevel!=="all"?scFilters.priceLevel:"";
+          const url=`/api/scrape-yelp?term=${encodeURIComponent(scQuery||term)}&location=${encodeURIComponent(loc)}&limit=20${price?`&price=${price}`:""}`;
+          apiRes=await fetch(url,{headers:{"X-API-Key":scKeys.yelp}});
+        }else if(scSrc==="instagram"||scSrc==="tiktok"||scSrc==="linkedin"){
+          const q=scQuery||`${scFilters.contentType&&scFilters.contentType!=="all"?scFilters.contentType.replace("_"," ")+" ":""}${scFilters.genre&&scFilters.genre!=="all"?scFilters.genre+" ":""}${scFilters.industry&&scFilters.industry!=="all"?scFilters.industry+" ":""}${scFilters.area&&scFilters.area!=="all"?scFilters.area:"Los Angeles"}`;
+          const url=`/api/scrape-social?platform=${scSrc}&query=${encodeURIComponent(q)}&num=10`;
+          apiRes=await fetch(url,{headers:{"X-API-Key":scKeys.google,"X-CSE-ID":scKeys.cseId}});
+        }
+        if(apiRes&&apiRes.ok){
+          const data=await apiRes.json();
+          const results=(data.results||[]).map(r=>fmtScrapeResult(scSrc,r));
+          if(results.length===0){setScanning(null);setScanRes([]);return;}
+          results.forEach((r,i)=>{setTimeout(()=>{setScanRes(p=>[...p,r]);if(i===results.length-1)setTimeout(()=>setScanning(null),500);},300*(i+1));});
+          return;
+        }else{
+          const err=apiRes?await apiRes.json().catch(()=>({})):{};
+          console.warn("API error, falling back to mock data:",err);
+        }
+      }catch(e){console.warn("API call failed, falling back to mock:",e);}
+    }
+    // ── Mock data fallback ──
     const results=filterScrapeDB(scSrc,scFilters);
     if(results.length===0){setTimeout(()=>{setScanning(null);setScanRes([]);},800);return;}
     results.forEach((r,i)=>{setTimeout(()=>{setScanRes(p=>[...p,r]);if(i===results.length-1)setTimeout(()=>setScanning(null),500);},600*(i+1));});
   };
   const importLead=(r)=>{
-    if(leads.some(l=>l.email===r.email))return;
-    setLeads(p=>[...p,{id:Date.now()+Math.random(),name:r.name,company:r.detail.split("·")[0].trim(),email:r.email,phone:"",source:scSrc||scanning||"manual",category:r.category,stage:"cold",notes:r.detail,lastContact:null,created:new Date().toISOString().slice(0,10)}]);
+    // Dedupe by email if available, otherwise by name+source
+    if(r.email&&leads.some(l=>l.email===r.email))return;
+    if(!r.email&&leads.some(l=>l.name===r.name&&l.source===(scSrc||scanning||"manual")))return;
+    const company=r.company||r.detail?.split("·")[0]?.trim()||"";
+    setLeads(p=>[...p,{id:Date.now()+Math.random(),name:r.name,company,email:r.email||"",phone:r.phone||"",source:scSrc||scanning||"manual",category:r.category||"commercial",stage:"cold",notes:r.detail||"",lastContact:null,created:new Date().toISOString().slice(0,10),profileUrl:r.profileUrl||r.mapsUrl||r.yelpUrl||r.website||""}]);
   };
 
   // Outreach
@@ -1056,7 +1102,33 @@ export default function App(){
 
         {/* ══════════ SCRAPER ══════════ */}
         {v==="scraper"&&(<>
-          <div className="ph"><div><div className="pt">Lead Scraper</div><div className="ps">Choose a source, set your filters, then scan</div></div></div>
+          <div className="ph"><div><div className="pt">Lead Scraper</div><div className="ps">{scKeys.google||scKeys.yelp?"Live data from real APIs":"Choose a source, set your filters, then scan"}</div></div><button className="btn btn-s" onClick={()=>setScShowKeys(p=>!p)}>⚙ API Keys</button></div>
+
+          {/* API KEY SETTINGS PANEL */}
+          {scShowKeys&&<div className="sp" style={{borderLeft:"3px solid var(--ac)"}}>
+            <div style={{fontSize:13,fontWeight:700,marginBottom:8}}>API Key Configuration</div>
+            <div style={{fontSize:11,color:"var(--t3)",marginBottom:12}}>Add free API keys to pull real data. Without keys, mock data is used as a preview.</div>
+            <div style={{display:"flex",flexDirection:"column",gap:10}}>
+              <div>
+                <label style={{fontSize:11,fontWeight:600,display:"block",marginBottom:3}}>Google API Key <span style={{color:"var(--t3)",fontWeight:400}}>(Places + Custom Search — free $200/mo)</span></label>
+                <input className="si" style={{width:"100%"}} placeholder="AIzaSy..." value={scKeys.google} onChange={e=>setScKey("google",e.target.value)}/>
+              </div>
+              <div>
+                <label style={{fontSize:11,fontWeight:600,display:"block",marginBottom:3}}>Google CSE ID <span style={{color:"var(--t3)",fontWeight:400}}>(for Instagram/TikTok/LinkedIn search)</span></label>
+                <input className="si" style={{width:"100%"}} placeholder="Custom Search Engine ID" value={scKeys.cseId} onChange={e=>setScKey("cseId",e.target.value)}/>
+              </div>
+              <div>
+                <label style={{fontSize:11,fontWeight:600,display:"block",marginBottom:3}}>Yelp Fusion API Key <span style={{color:"var(--t3)",fontWeight:400}}>(free 500 calls/day)</span></label>
+                <input className="si" style={{width:"100%"}} placeholder="Bearer token from Yelp" value={scKeys.yelp} onChange={e=>setScKey("yelp",e.target.value)}/>
+              </div>
+            </div>
+            <div style={{marginTop:10,display:"flex",gap:6,flexWrap:"wrap"}}>
+              {scKeys.google&&<span className="tag" style={{background:"rgba(52,211,153,.12)",color:"var(--ok)"}}>✓ Google Maps</span>}
+              {scKeys.yelp&&<span className="tag" style={{background:"rgba(52,211,153,.12)",color:"var(--ok)"}}>✓ Yelp</span>}
+              {scKeys.google&&scKeys.cseId&&<span className="tag" style={{background:"rgba(52,211,153,.12)",color:"var(--ok)"}}>✓ Instagram / TikTok / LinkedIn</span>}
+              {!scKeys.google&&!scKeys.yelp&&<span className="tag" style={{background:"rgba(248,113,113,.12)",color:"var(--no)"}}>No keys — using mock data</span>}
+            </div>
+          </div>}
 
           {/* STEP 1 — SOURCE SELECTION */}
           <div className="sp">
@@ -1076,9 +1148,13 @@ export default function App(){
                 {activeFilterCount>0&&<button className="btn btn-s" onClick={resetScFilters}>Reset All ({activeFilterCount})</button>}
               </div>
             </div>
-            {/* Search bar */}
+            {/* Live API query OR mock search bar */}
             <div style={{marginBottom:10}}>
-              <input className="si" placeholder="Search by name, keyword, location…" value={scFilters.search||""} onChange={e=>setScFilter("search",e.target.value)} style={{width:"100%",maxWidth:400}}/>
+              {hasApiKey(scSrc)?(<div>
+                <div style={{fontSize:10.5,color:"var(--ac)",fontWeight:600,marginBottom:4}}>🔴 LIVE MODE — Real API data</div>
+                <input className="si" placeholder={scSrc==="google_maps"?"e.g. vintage shops in Silver Lake":scSrc==="yelp"?"e.g. sushi restaurants near Echo Park":scSrc==="instagram"?"e.g. hip-hop artists Los Angeles":scSrc==="tiktok"?"e.g. food creators in LA":scSrc==="linkedin"?"e.g. marketing directors Los Angeles":"Search…"} value={scQuery} onChange={e=>setScQuery(e.target.value)} style={{width:"100%",maxWidth:500}} onKeyDown={e=>{if(e.key==="Enter"&&!scanning)runScan();}}/>
+                <div style={{fontSize:9.5,color:"var(--t3)",marginTop:3}}>Type a custom search query, or leave blank to auto-build from filters below</div>
+              </div>):(<input className="si" placeholder="Search by name, keyword, location…" value={scFilters.search||""} onChange={e=>setScFilter("search",e.target.value)} style={{width:"100%",maxWidth:400}}/>)}
             </div>
             {/* Dynamic filter dropdowns */}
             <div className="sf-bar" style={{flexWrap:"wrap"}}>
@@ -1103,13 +1179,13 @@ export default function App(){
             {/* SCAN BUTTON */}
             <div style={{marginTop:14}}>
               <button className={`btn btn-p ${scanning?"":""}`} disabled={!!scanning} onClick={runScan} style={{padding:"8px 22px",fontSize:13}}>
-                {scanning===scSrc?"⏳ Scanning…":`Scan ${SRC_FILTERS[scSrc].label}`} {activeFilterCount>0?`(${activeFilterCount} filter${activeFilterCount>1?"s":""})`:""}
+                {scanning===scSrc?"⏳ Scanning…":hasApiKey(scSrc)?`🔴 Live Scan ${SRC_FILTERS[scSrc].label}`:`Scan ${SRC_FILTERS[scSrc].label}`} {activeFilterCount>0?`(${activeFilterCount} filter${activeFilterCount>1?"s":""})`:""}
               </button>
             </div>
           </div>)}
 
           {/* RESULTS */}
-          {scanRes.length>0&&<div className="sp"><div style={{fontSize:13,fontWeight:700,marginBottom:10}}>Results ({scanRes.length})</div>{scanRes.map((r,i)=>{const ex=leads.some(l=>l.email===r.email);return<div className="sr-i" key={i}><div><div className="sn">{r.name}</div><div className="sd">{r.detail}{r.email?" · "+r.email:""}</div></div>{r.email?<button className={`btn btn-s ${ex?"":"btn-p"}`} disabled={ex} onClick={()=>importLead(r)}>{ex?"Added ✓":"+ Import"}</button>:<span style={{fontSize:10,color:"var(--t3)"}}>No email</span>}</div>;})}</div>}
+          {scanRes.length>0&&<div className="sp"><div style={{fontSize:13,fontWeight:700,marginBottom:10}}>Results ({scanRes.length}){scanRes[0]?._source?<span style={{fontSize:10,fontWeight:400,color:"var(--ac)",marginLeft:8}}>🔴 Live</span>:""}</div>{scanRes.map((r,i)=>{const ex=r.email?leads.some(l=>l.email===r.email):leads.some(l=>l.name===r.name&&l.source===(scSrc||"manual"));return<div className="sr-i" key={i}><div style={{flex:1,minWidth:0}}><div className="sn">{r.name}{r.profileUrl||r.mapsUrl||r.yelpUrl?<a href={r.profileUrl||r.mapsUrl||r.yelpUrl} target="_blank" rel="noopener noreferrer" style={{fontSize:10,marginLeft:6,color:"var(--ac)",textDecoration:"none"}} onClick={e=>e.stopPropagation()}>↗ View</a>:""}</div><div className="sd">{r.detail}{r.email?" · "+r.email:""}{!r.email&&r.phone?" · "+r.phone:""}</div></div><button className={`btn btn-s ${ex?"":"btn-p"}`} disabled={ex} onClick={()=>importLead(r)}>{ex?"Added ✓":"+ Import"}</button></div>;})}</div>}
           {scanning===null&&scanRes.length===0&&scSrc&&<div className="sp" style={{textAlign:"center",padding:20,color:"var(--t3)",fontSize:12}}>{activeFilterCount>0?"No results matched your filters. Try adjusting or resetting filters.":""}</div>}
         </>)}
 
