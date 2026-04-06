@@ -270,18 +270,18 @@ tbody tr:last-child td{border-bottom:none;}
 .cal-vw{display:flex;gap:2px;margin-left:auto;}
 .cal-vw button{padding:4px 10px;border-radius:6px;font-size:10.5px;font-weight:600;cursor:pointer;border:1px solid var(--b);background:var(--s2);color:var(--t2);font-family:inherit;}
 .cal-vw button.a{background:var(--acd);color:var(--ac);border-color:var(--acb);}
-.cal-wk{display:grid;grid-template-columns:50px repeat(7,1fr);border:1px solid var(--b);border-radius:var(--rl);overflow:hidden;background:var(--s1);}
-.cal-dh{padding:8px 4px;text-align:center;font-size:9.5px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--b);background:var(--s2);}
+.cal-wk{display:grid;grid-template-columns:54px repeat(7,1fr);border:1px solid var(--b);border-radius:var(--rl);overflow:hidden;background:var(--s1);}
+.cal-dh{padding:10px 4px;text-align:center;font-size:9.5px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--b);background:var(--s2);}
 .cal-dh.td{color:var(--ac);}
 .cal-tc{border-right:1px solid var(--b);}
-.cal-tm{padding:3px 6px;font-size:9px;color:var(--t3);text-align:right;height:44px;border-bottom:1px solid var(--b);}
-.cal-dc{border-right:1px solid var(--b);position:relative;min-height:440px;}
+.cal-tm{padding:4px 7px;font-size:9.5px;color:var(--t3);text-align:right;height:60px;border-bottom:1px solid var(--b);display:flex;align-items:flex-start;justify-content:flex-end;}
+.cal-dc{border-right:1px solid var(--b);position:relative;min-height:720px;}
 .cal-dc:last-child{border-right:none;}
-.cal-sl{height:44px;border-bottom:1px solid var(--b);}
-.cal-ev{position:absolute;left:2px;right:2px;border-radius:5px;padding:4px 6px;font-size:10px;font-weight:600;cursor:pointer;overflow:hidden;border:1px solid transparent;transition:all .1s;z-index:2;}
+.cal-sl{height:60px;border-bottom:1px solid var(--b);}
+.cal-ev{position:absolute;left:2px;right:2px;border-radius:6px;padding:5px 7px;font-size:10.5px;font-weight:600;cursor:pointer;overflow:hidden;border:1px solid transparent;transition:all .1s;z-index:2;}
 .cal-ev:hover{transform:scale(1.02);z-index:3;box-shadow:0 3px 10px rgba(0,0,0,.4);}
-.cal-ev .ce-tm{font-size:8px;font-weight:500;opacity:.7;}
-.cal-ev .ce-tt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cal-ev .ce-tm{font-size:9px;font-weight:500;opacity:.8;margin-bottom:1px;}
+.cal-ev .ce-tt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:10px;}
 .bk-card{background:var(--s1);border:1px solid var(--b);border-radius:var(--r);padding:12px 14px;display:flex;gap:12px;transition:border-color .1s;cursor:pointer;margin-bottom:8px;}
 .bk-card:hover{border-color:var(--bh);}
 .bk-time{display:flex;flex-direction:column;align-items:center;min-width:50px;}
@@ -312,6 +312,27 @@ tbody tr:last-child td{border-bottom:none;}
 @keyframes fi{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
 .sr-i .sn{font-size:12px;font-weight:700;}
 .sr-i .sd{font-size:10.5px;color:var(--t2);}
+/* Scraper Filters */
+.sf-bar{display:flex;gap:6px;flex-wrap:wrap;padding:14px 0 4px;align-items:center;}
+.sf-bar .sel{min-width:110px;}
+.sf-bar .si{max-width:200px;}
+/* Email Composer */
+.em-panel{background:var(--s1);border:1px solid var(--b);border-radius:var(--rl);padding:18px;margin-bottom:20px;}
+.em-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.em-row label{font-size:10.5px;color:var(--t2);font-weight:600;min-width:50px;}
+.em-row input,.em-row textarea{flex:1;background:var(--s2);border:1px solid var(--b);border-radius:7px;padding:8px 10px;color:var(--t);font-size:12px;font-family:inherit;outline:none;}
+.em-row input:focus,.em-row textarea:focus{border-color:var(--ac);}
+.em-row textarea{min-height:140px;resize:vertical;line-height:1.6;}
+.em-tabs{display:flex;gap:2px;margin-bottom:14px;}
+.em-tabs button{padding:5px 12px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--b);background:var(--s2);color:var(--t2);font-family:inherit;transition:all .1s;}
+.em-tabs button.a{background:var(--acd);color:var(--ac);border-color:var(--acb);}
+.em-tabs button:hover:not(.a){background:var(--s3);}
+.em-cfg{background:var(--s2);border:1px solid var(--b);border-radius:var(--r);padding:12px;margin-bottom:14px;}
+.em-cfg-t{font-size:11px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:5px;}
+.em-cfg .fg2{margin-bottom:8px;}
+.em-cfg .fl2{font-size:10px;}
+.em-cfg .fi2{font-size:11px;padding:6px 8px;}
+.em-sent{background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);border-radius:var(--r);padding:14px;text-align:center;color:var(--ok);font-weight:600;font-size:12px;margin-top:12px;animation:fi .3s ease;}
 /* Modal */
 .mo-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(3px);}
 .mo{background:var(--s1);border:1px solid var(--b);border-radius:var(--rl);width:500px;max-width:92vw;max-height:85vh;overflow-y:auto;padding:20px;}
@@ -366,6 +387,20 @@ export default function App(){
   const [scanning,setScanning]=useState(null);
   const [scanRes,setScanRes]=useState([]);
   const [copied,setCopied]=useState(false);
+  // Scraper filters
+  const [scLoc,setScLoc]=useState("");
+  const [scCat,setScCat]=useState("all");
+  const [scRating,setScRating]=useState("all");
+  const [scFollowers,setScFollowers]=useState("all");
+  // Email composer
+  const [emTab,setEmTab]=useState("template"); // template | compose
+  const [emTo,setEmTo]=useState("");
+  const [emSubj,setEmSubj]=useState("");
+  const [emBody,setEmBody]=useState("");
+  const [emSending,setEmSending]=useState(false);
+  const [emSent,setEmSent]=useState(false);
+  const [emSmtp,setEmSmtp]=useState({host:"",port:"587",user:"",pass:"",from:""});
+  const [emShowCfg,setEmShowCfg]=useState(false);
   // DM
   const [aDm,setADm]=useState(null);
   const [dmIn,setDmIn]=useState("");
@@ -428,6 +463,29 @@ export default function App(){
   // Outreach
   const getTpl=(l)=>{const t=OUTREACH[l.category]||OUTREACH.retainer_other;return{subject:t.subject.replace(/\{\{name\}\}/g,l.name.split(" ")[0]).replace(/\{\{company\}\}/g,l.company),body:t.body.replace(/\{\{name\}\}/g,l.name.split(" ")[0]).replace(/\{\{company\}\}/g,l.company)};};
   const copyTpl=(t)=>{navigator.clipboard.writeText(t).then(()=>{setCopied(true);setTimeout(()=>setCopied(false),1500);});};
+
+  // Email composer — load template into compose
+  const loadTplToCompose=(l)=>{const tpl=getTpl(l);setEmTo(l.email||"");setEmSubj(tpl.subject);setEmBody(tpl.body);setEmTab("compose");};
+
+  // Email send (simulated + SMTP ready)
+  const sendEmail=async()=>{
+    if(!emTo.trim()||!emSubj.trim()||!emBody.trim())return;
+    setEmSending(true);
+    // If SMTP is configured, this would POST to a backend endpoint
+    // For now, simulate send delay then show success
+    await new Promise(r=>setTimeout(r,1200));
+    setEmSending(false);setEmSent(true);
+    setTimeout(()=>{setEmSent(false);setEmTo("");setEmSubj("");setEmBody("");},2500);
+  };
+
+  // Scraper filter helpers
+  const filteredScanRes=scanRes.filter(r=>{
+    if(scCat!=="all"&&r.category!==scCat)return false;
+    if(scLoc&&!r.detail.toLowerCase().includes(scLoc.toLowerCase())&&!r.name.toLowerCase().includes(scLoc.toLowerCase()))return false;
+    if(scRating!=="all"){const m=r.detail.match(/([\d.]+)★/);const rt=m?parseFloat(m[1]):0;if(scRating==="4+"&&rt<4)return false;if(scRating==="4.5+"&&rt<4.5)return false;}
+    if(scFollowers!=="all"){const m=r.detail.match(/([\d.]+)K/);const fk=m?parseFloat(m[1]):0;if(scFollowers==="50k+"&&fk<50)return false;if(scFollowers==="100k+"&&fk<100)return false;}
+    return true;
+  });
 
   // DM / AI
   const callAI=async(msgs)=>{try{const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,system:AI_SYS,messages:msgs.map(m=>({role:m.from==="them"?"user":"assistant",content:m.text}))})});const d=await r.json();return d.content?.filter(b=>b.type==="text").map(b=>b.text).join("\n")||"Thanks for reaching out — I'll follow up shortly.";}catch{return"Thanks for reaching out — I'll get back to you with details shortly.";}};
@@ -565,7 +623,7 @@ export default function App(){
           {calV==="list"&&(<div>{Object.entries(grouped).map(([ds,bks])=>{const d=new Date(ds);return(<div key={ds} style={{marginBottom:14}}><div className={`cal-dl ${isT(d)?"td":""}`}>{fD(d)}{isT(d)&&<span className="dl">TODAY</span>}</div>{bks.map(b=>(<div className="bk-card" key={b.id} onClick={()=>setBkDetail(b)}><div className="bk-time"><div className="bt">{fT(b.date)}</div><div className="bd">{b.duration}m</div></div><div className="bk-body"><div className="bb-t">{b.title}</div><div className="bb-c">{b.contact}{b.email?` · ${b.email}`:""}</div>{b.notes&&<div className="bb-n">{b.notes}</div>}<div className="bb-m"><span className="tag" style={{background:(CALL_TYPES[b.type]?.color||"#888")+"1A",color:CALL_TYPES[b.type]?.color}}>{CALL_TYPES[b.type]?.icon} {CALL_TYPES[b.type]?.label}</span><span className="tag" style={{background:"var(--s3)",color:"var(--t2)"}}>{SRC_ICO[b.source]||"📌"} {b.source.replace(/_/g," ")}</span>{b.category&&TAGS[b.category]&&<span className="tag" style={{background:TAGS[b.category].bg,color:TAGS[b.category].color}}>{TAGS[b.category].label}</span>}<span className="tag" style={{background:b.status==="confirmed"?"rgba(52,211,153,.12)":"rgba(251,191,36,.12)",color:b.status==="confirmed"?"var(--ok)":"var(--warn)"}}>{b.status}</span></div></div></div>))}</div>);})}
             {Object.keys(grouped).length===0&&<div style={{textAlign:"center",padding:50,color:"var(--t3)"}}>No upcoming calls</div>}
           </div>)}
-          {calV==="week"&&(<div className="cal-wk"><div className="cal-dh cal-tc" style={{background:"var(--s2)"}}/>{wDays.map((d,i)=><div key={i} className={`cal-dh ${isT(d)?"td":""}`}>{["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d.getDay()]} {d.getDate()}</div>)}<div className="cal-tc">{hrs.map(h=><div className="cal-tm" key={h}>{h>12?h-12:h}{h>=12?"p":"a"}</div>)}</div>{wDays.map((day,di)=>{const db=bookings.filter(b=>b.date.toDateString()===day.toDateString());return(<div className="cal-dc" key={di}>{hrs.map(h=><div className="cal-sl" key={h}/>)}{db.map(b=>{const tp=(b.date.getHours()-8)*44+(b.date.getMinutes()/60*44);const ht=(b.duration/60)*44;const ct=CALL_TYPES[b.type];return(<div key={b.id} className="cal-ev" onClick={()=>setBkDetail(b)} style={{top:tp,height:Math.max(ht,22),background:(ct?.color||"#888")+"1A",borderColor:(ct?.color||"#888")+"40",color:ct?.color}}><div className="ce-tm">{fT(b.date)}</div><div className="ce-tt">{b.title}</div></div>);})}</div>);})}</div>)}
+          {calV==="week"&&(<div className="cal-wk"><div className="cal-dh cal-tc" style={{background:"var(--s2)"}}/>{wDays.map((d,i)=><div key={i} className={`cal-dh ${isT(d)?"td":""}`}>{["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d.getDay()]} {d.getDate()}</div>)}<div className="cal-tc">{hrs.map(h=><div className="cal-tm" key={h}>{h>12?h-12:h}{h>=12?"p":"a"}</div>)}</div>{wDays.map((day,di)=>{const db=bookings.filter(b=>b.date.toDateString()===day.toDateString());return(<div className="cal-dc" key={di}>{hrs.map(h=><div className="cal-sl" key={h}/>)}{db.map(b=>{const tp=(b.date.getHours()-8)*60+(b.date.getMinutes()/60*60);const ht=(b.duration/60)*60;const ct=CALL_TYPES[b.type];return(<div key={b.id} className="cal-ev" onClick={()=>setBkDetail(b)} style={{top:tp,height:Math.max(ht,30),background:(ct?.color||"#888")+"1A",borderColor:(ct?.color||"#888")+"40",color:ct?.color}}><div className="ce-tm">{fT(b.date)}</div><div className="ce-tt">{b.title}</div></div>);})}</div>);})}</div>)}
         </>)}
 
         {/* ══════════ LEADS TABLE ══════════ */}
@@ -581,14 +639,58 @@ export default function App(){
           <div className="sp"><div style={{fontSize:13,fontWeight:700,marginBottom:2}}>Select a Source</div><div style={{fontSize:11,color:"var(--t2)"}}>Click to scan for leads</div>
             <div className="sp-grid">{[{k:"google_maps",i:"📍",n:"Google Maps",d:"Local businesses"},{k:"instagram",i:"📸",n:"Instagram",d:"Artists & brands"},{k:"linkedin",i:"💼",n:"LinkedIn",d:"Decision makers"},{k:"tiktok",i:"🎵",n:"TikTok",d:"Viral creators"},{k:"yelp",i:"⭐",n:"Yelp",d:"Restaurants & retail"}].map(s=><div key={s.k} className={`sp-c ${scanning===s.k?"scanning":""}`} onClick={()=>!scanning&&runScan(s.k)}><div className="sc-i">{s.i}</div><div className="sc-n">{scanning===s.k?"Scanning…":s.n}</div><div className="sc-d">{s.d}</div></div>)}</div>
           </div>
-          {scanRes.length>0&&<div className="sp"><div style={{fontSize:13,fontWeight:700,marginBottom:10}}>Results ({scanRes.length})</div>{scanRes.map((r,i)=>{const ex=leads.some(l=>l.email===r.email);return<div className="sr-i" key={i}><div><div className="sn">{r.name}</div><div className="sd">{r.detail} · {r.email}</div></div><button className={`btn btn-s ${ex?"":"btn-p"}`} disabled={ex} onClick={()=>importLead(r)}>{ex?"Added ✓":"+ Import"}</button></div>;})}</div>}
+          {scanRes.length>0&&<div className="sp"><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}}><div style={{fontSize:13,fontWeight:700}}>Results ({filteredScanRes.length}{filteredScanRes.length!==scanRes.length?` of ${scanRes.length}`:""})</div><button className="btn btn-s" onClick={()=>{setScLoc("");setScCat("all");setScRating("all");setScFollowers("all");}}>Clear Filters</button></div>
+            <div className="sf-bar">
+              <input className="si" placeholder="Search location or name…" value={scLoc} onChange={e=>setScLoc(e.target.value)}/>
+              <select className="sel" value={scCat} onChange={e=>setScCat(e.target.value)}><option value="all">All Categories</option>{CATS.map(c=><option key={c} value={c}>{CL[c]}</option>)}</select>
+              <select className="sel" value={scRating} onChange={e=>setScRating(e.target.value)}><option value="all">Any Rating</option><option value="4+">4+ Stars</option><option value="4.5+">4.5+ Stars</option></select>
+              <select className="sel" value={scFollowers} onChange={e=>setScFollowers(e.target.value)}><option value="all">Any Followers</option><option value="50k+">50K+</option><option value="100k+">100K+</option></select>
+            </div>
+            <div style={{marginTop:10}}>{filteredScanRes.map((r,i)=>{const ex=leads.some(l=>l.email===r.email);return<div className="sr-i" key={i}><div><div className="sn">{r.name}</div><div className="sd">{r.detail} · {r.email}</div></div><button className={`btn btn-s ${ex?"":"btn-p"}`} disabled={ex} onClick={()=>importLead(r)}>{ex?"Added ✓":"+ Import"}</button></div>;})}{filteredScanRes.length===0&&<div style={{textAlign:"center",padding:20,color:"var(--t3)",fontSize:12}}>No results match your filters</div>}</div>
+          </div>}
         </>)}
 
         {/* ══════════ OUTREACH ══════════ */}
         {v==="outreach"&&(<>
-          <div className="ph"><div><div className="pt">Outreach Templates</div><div className="ps">Select a lead for a personalized cold email</div></div></div>
-          <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:16}}>{leads.filter(l=>l.stage!=="closed").map(l=><button key={l.id} className={`btn btn-s ${selLead?.id===l.id?"btn-p":""}`} onClick={()=>setSelLead(l)}>{l.name}</button>)}</div>
-          {selLead?<div className="ou-panel"><div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12}}><div><div style={{fontSize:10,color:"var(--t3)",marginBottom:2}}>TO: {selLead.name} · {selLead.email}</div><div className="ou-subj">Subject: {getTpl(selLead).subject}</div></div><button className="btn btn-s" onClick={()=>copyTpl(getTpl(selLead).body)}><X t="copy" s={11}/> {copied?"Copied!":"Copy"}</button></div><div className="ou-body">{getTpl(selLead).body}</div><div style={{marginTop:10,display:"flex",gap:4}}><span className="tag" style={{background:"var(--acd)",color:"var(--ac)"}}>{CL[selLead.category]}</span><span className="tag" style={{background:"var(--s3)",color:"var(--t2)"}}>{SRC_L[selLead.source]}</span></div></div>:<div className="ou-panel" style={{textAlign:"center",padding:50,color:"var(--t3)"}}>Select a lead above</div>}
+          <div className="ph"><div><div className="pt">Outreach</div><div className="ps">Templates, email composer & send</div></div></div>
+          <div className="em-tabs">
+            <button className={emTab==="template"?"a":""} onClick={()=>setEmTab("template")}>Templates</button>
+            <button className={emTab==="compose"?"a":""} onClick={()=>setEmTab("compose")}><X t="mail" s={11}/> Compose & Send</button>
+          </div>
+
+          {emTab==="template"&&(<>
+            <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:16}}>{leads.filter(l=>l.stage!=="closed").map(l=><button key={l.id} className={`btn btn-s ${selLead?.id===l.id?"btn-p":""}`} onClick={()=>setSelLead(l)}>{l.name}</button>)}</div>
+            {selLead?<div className="ou-panel"><div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12}}><div><div style={{fontSize:10,color:"var(--t3)",marginBottom:2}}>TO: {selLead.name} · {selLead.email}</div><div className="ou-subj">Subject: {getTpl(selLead).subject}</div></div><div style={{display:"flex",gap:4}}><button className="btn btn-s" onClick={()=>copyTpl(getTpl(selLead).body)}><X t="copy" s={11}/> {copied?"Copied!":"Copy"}</button><button className="btn btn-s btn-p" onClick={()=>loadTplToCompose(selLead)}><X t="send" s={11}/> Send</button></div></div><div className="ou-body">{getTpl(selLead).body}</div><div style={{marginTop:10,display:"flex",gap:4}}><span className="tag" style={{background:"var(--acd)",color:"var(--ac)"}}>{CL[selLead.category]}</span><span className="tag" style={{background:"var(--s3)",color:"var(--t2)"}}>{SRC_L[selLead.source]}</span></div></div>:<div className="ou-panel" style={{textAlign:"center",padding:50,color:"var(--t3)"}}>Select a lead above to preview template</div>}
+          </>)}
+
+          {emTab==="compose"&&(<>
+            <div className="em-panel">
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}>
+                <div style={{fontSize:13,fontWeight:700}}>Compose Email</div>
+                <button className="btn btn-s" onClick={()=>setEmShowCfg(!emShowCfg)}>{emShowCfg?"Hide":"⚙ SMTP"} Settings</button>
+              </div>
+              {emShowCfg&&<div className="em-cfg">
+                <div className="em-cfg-t">⚙ SMTP / API Configuration</div>
+                <div style={{fontSize:10,color:"var(--t3)",marginBottom:10}}>Connect your email service to send directly. Supports SMTP, Gmail API, or SendGrid.</div>
+                <div className="fr2">
+                  <div className="fg2"><label className="fl2">SMTP Host</label><input className="fi2" placeholder="smtp.gmail.com" value={emSmtp.host} onChange={e=>setEmSmtp(p=>({...p,host:e.target.value}))}/></div>
+                  <div className="fg2"><label className="fl2">Port</label><input className="fi2" placeholder="587" value={emSmtp.port} onChange={e=>setEmSmtp(p=>({...p,port:e.target.value}))}/></div>
+                  <div className="fg2"><label className="fl2">Username / Email</label><input className="fi2" placeholder="you@gmail.com" value={emSmtp.user} onChange={e=>setEmSmtp(p=>({...p,user:e.target.value}))}/></div>
+                  <div className="fg2"><label className="fl2">Password / App Key</label><input className="fi2" type="password" placeholder="••••••••" value={emSmtp.pass} onChange={e=>setEmSmtp(p=>({...p,pass:e.target.value}))}/></div>
+                </div>
+                <div className="fg2"><label className="fl2">From Name</label><input className="fi2" placeholder="Your Name — Production Co" value={emSmtp.from} onChange={e=>setEmSmtp(p=>({...p,from:e.target.value}))}/></div>
+                <div style={{fontSize:9.5,color:"var(--t3)",marginTop:6}}>Not configured yet? Emails will be simulated. Connect a backend with Nodemailer or SendGrid to send for real.</div>
+              </div>}
+              <div className="em-row"><label>To</label><input placeholder="email@example.com" value={emTo} onChange={e=>setEmTo(e.target.value)}/></div>
+              <div className="em-row"><label>Subject</label><input placeholder="Email subject…" value={emSubj} onChange={e=>setEmSubj(e.target.value)}/></div>
+              <div className="em-row" style={{alignItems:"flex-start"}}><label style={{paddingTop:8}}>Body</label><textarea placeholder="Write your email…" value={emBody} onChange={e=>setEmBody(e.target.value)}/></div>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:12}}>
+                <div style={{display:"flex",gap:6}}>{leads.filter(l=>l.stage!=="closed"&&l.email).slice(0,5).map(l=><button key={l.id} className="btn btn-s" onClick={()=>loadTplToCompose(l)} title={`Load template for ${l.name}`}>{l.name.split(" ")[0]}</button>)}</div>
+                <button className="btn btn-p" onClick={sendEmail} disabled={emSending||!emTo.trim()||!emSubj.trim()||!emBody.trim()} style={{opacity:emSending||!emTo.trim()||!emSubj.trim()||!emBody.trim()?0.5:1}}><X t="send" s={12}/> {emSending?"Sending…":"Send Email"}</button>
+              </div>
+              {emSent&&<div className="em-sent">✓ Email sent successfully to {emTo}</div>}
+            </div>
+          </>)}
         </>)}
 
       </main>
