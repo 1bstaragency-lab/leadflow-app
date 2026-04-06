@@ -108,12 +108,76 @@ const INIT_BOOKINGS=[
   {id:"b8",title:"Follow-up — Casa Oaxaca",date:new Date(2026,3,6,11,30),duration:30,type:"follow_up",source:"manual",contact:"Luna Martinez",email:"luna@casaoaxaca.com",phone:"555-0106",category:"restaurant",notes:"Follow up on retainer proposal.",status:"confirmed"},
 ];
 
-const SCRAPE_RES={
-  google_maps:[{name:"Golden Hour Café",detail:"Coffee shop · 4.7★ · Downtown",category:"retainer_restaurant",email:"hello@goldenhour.com"},{name:"Midnight Vinyl",detail:"Record shop · 4.5★ · Arts District",category:"retainer_vintage",email:"info@midnightvinyl.com"},{name:"Sakura Ramen",detail:"Japanese · 4.8★ · Midtown",category:"retainer_restaurant",email:"contact@sakuraramen.com"}],
-  instagram:[{name:"Jay Monet",detail:"@jaymonet · 120K · Hip-hop artist",category:"music_video",email:"mgmt@jaymonet.com"},{name:"Vibe Athletics",detail:"@vibeathletics · 85K · Activewear",category:"commercial",email:"collab@vibeathletics.com"},{name:"The Rustic Edit",detail:"@therusticedit · 40K · Vintage",category:"retainer_vintage",email:"shop@therusticedit.com"}],
-  linkedin:[{name:"Rachel Kim",detail:"Marketing Dir at FreshBrew Co",category:"commercial",email:"rachel@freshbrew.co"},{name:"Daniel Okafor",detail:"CEO at StreetVault Vintage",category:"retainer_vintage",email:"daniel@streetvault.com"},{name:"Maria Gonzalez",detail:"Owner at Cantina Sol",category:"retainer_restaurant",email:"maria@cantinasol.com"}],
-  tiktok:[{name:"Kira Nova",detail:"@kiranova · 500K · Pop artist",category:"music_video",email:"booking@kiranova.com"},{name:"Drip Society",detail:"@dripsociety · 220K · Streetwear",category:"commercial",email:"brand@dripsociety.com"}],
-  yelp:[{name:"Ember & Oak",detail:"New American · 4.6★ · West Side",category:"retainer_restaurant",email:"events@emberandoak.com"},{name:"Thrift & Thread",detail:"Vintage · 4.4★ · East Village",category:"retainer_vintage",email:"hello@thriftthread.com"}],
+// Expanded scrape data with structured fields for pre-scan filtering
+const SCRAPE_DB={
+  google_maps:[
+    {name:"Golden Hour Café",type:"Coffee shop",rating:4.7,area:"Downtown",category:"retainer_restaurant",email:"hello@goldenhour.com"},
+    {name:"Midnight Vinyl",type:"Record shop",rating:4.5,area:"Arts District",category:"retainer_vintage",email:"info@midnightvinyl.com"},
+    {name:"Sakura Ramen",type:"Japanese",rating:4.8,area:"Midtown",category:"retainer_restaurant",email:"contact@sakuraramen.com"},
+    {name:"Casa Luna",type:"Mexican",rating:4.3,area:"Silver Lake",category:"retainer_restaurant",email:"info@casaluna.la"},
+    {name:"Epoch Vintage",type:"Vintage clothing",rating:4.6,area:"Echo Park",category:"retainer_vintage",email:"hey@epochvintage.com"},
+    {name:"Nori Bowl",type:"Poke & bowls",rating:4.1,area:"Santa Monica",category:"retainer_restaurant",email:"hello@noribowl.com"},
+    {name:"The Painted Door",type:"Gallery & café",rating:4.9,area:"Arts District",category:"retainer_other",email:"info@painteddoor.la"},
+    {name:"Vinyl & Threads",type:"Vintage + records",rating:3.8,area:"Highland Park",category:"retainer_vintage",email:"shop@vinylthreads.com"},
+    {name:"Fuego Street Tacos",type:"Street food",rating:4.4,area:"Boyle Heights",category:"retainer_restaurant",email:"fuego@streettacos.com"},
+    {name:"Greenhouse Juice",type:"Juice bar",rating:4.2,area:"Venice",category:"retainer_other",email:"hi@greenhousejuice.com"},
+  ],
+  instagram:[
+    {name:"Jay Monet",handle:"@jaymonet",followers:120,niche:"Hip-hop artist",category:"music_video",email:"mgmt@jaymonet.com"},
+    {name:"Vibe Athletics",handle:"@vibeathletics",followers:85,niche:"Activewear",category:"commercial",email:"collab@vibeathletics.com"},
+    {name:"The Rustic Edit",handle:"@therusticedit",followers:40,niche:"Vintage",category:"retainer_vintage",email:"shop@therusticedit.com"},
+    {name:"Melody Kane",handle:"@melodykane",followers:28,niche:"Indie/pop artist",category:"music_video",email:"mel@melodykane.com"},
+    {name:"Raw Denim Co",handle:"@rawdenimco",followers:150,niche:"Streetwear brand",category:"commercial",email:"brand@rawdenim.co"},
+    {name:"Chef Dominique",handle:"@chefdominique",followers:62,niche:"Chef & restaurant",category:"retainer_restaurant",email:"dom@chefdominique.com"},
+    {name:"Luxe Curated",handle:"@luxecurated",followers:95,niche:"Luxury vintage",category:"retainer_vintage",email:"info@luxecurated.com"},
+    {name:"K.Soto Music",handle:"@ksotomusic",followers:210,niche:"R&B / Soul artist",category:"music_video",email:"mgmt@ksoto.com"},
+    {name:"Bloom Studio",handle:"@bloomstudio",followers:18,niche:"Yoga & wellness",category:"retainer_other",email:"hello@bloomstudio.co"},
+    {name:"Neon Nights",handle:"@neonnightsla",followers:340,niche:"Nightlife brand",category:"commercial",email:"events@neonnights.la"},
+  ],
+  linkedin:[
+    {name:"Rachel Kim",role:"Marketing Dir",company:"FreshBrew Co",industry:"Beverage",category:"commercial",email:"rachel@freshbrew.co"},
+    {name:"Daniel Okafor",role:"CEO",company:"StreetVault Vintage",industry:"Retail",category:"retainer_vintage",email:"daniel@streetvault.com"},
+    {name:"Maria Gonzalez",role:"Owner",company:"Cantina Sol",industry:"Restaurant",category:"retainer_restaurant",email:"maria@cantinasol.com"},
+    {name:"Jason Park",role:"Brand Manager",company:"Halo Spirits",industry:"Beverage",category:"commercial",email:"jason@halospirits.com"},
+    {name:"Tanya Rivera",role:"Founder",company:"Nostalgia Threads",industry:"Retail",category:"retainer_vintage",email:"tanya@nostalgiathreads.com"},
+    {name:"Chris Adler",role:"VP Marketing",company:"Prism Fitness",industry:"Fitness",category:"commercial",email:"chris@prismfit.com"},
+  ],
+  tiktok:[
+    {name:"Kira Nova",handle:"@kiranova",followers:500,niche:"Pop artist",category:"music_video",email:"booking@kiranova.com"},
+    {name:"Drip Society",handle:"@dripsociety",followers:220,niche:"Streetwear",category:"commercial",email:"brand@dripsociety.com"},
+    {name:"AJ Flames",handle:"@ajflames",followers:78,niche:"Rapper",category:"music_video",email:"aj@ajflames.com"},
+    {name:"Faded Goods",handle:"@fadedgoods",followers:145,niche:"Vintage reseller",category:"retainer_vintage",email:"hi@fadedgoods.com"},
+    {name:"Bao House",handle:"@baohousela",followers:52,niche:"Restaurant",category:"retainer_restaurant",email:"eat@baohouse.la"},
+  ],
+  yelp:[
+    {name:"Ember & Oak",type:"New American",rating:4.6,area:"West Side",category:"retainer_restaurant",email:"events@emberandoak.com"},
+    {name:"Thrift & Thread",type:"Vintage",rating:4.4,area:"East Village",category:"retainer_vintage",email:"hello@thriftthread.com"},
+    {name:"Pho District",type:"Vietnamese",rating:4.7,area:"Chinatown",category:"retainer_restaurant",email:"info@phodistrict.la"},
+    {name:"Retro Luxe",type:"Vintage boutique",rating:4.2,area:"Los Feliz",category:"retainer_vintage",email:"shop@retroluxe.com"},
+    {name:"Wild Flour Bakery",type:"Bakery & café",rating:4.8,area:"Culver City",category:"retainer_restaurant",email:"bake@wildflour.com"},
+  ],
+};
+
+// Format scrape results for display based on source type
+const fmtScrapeResult=(src,r)=>{
+  if(src==="google_maps")return{...r,detail:`${r.type} · ${r.rating}★ · ${r.area}`};
+  if(src==="instagram")return{...r,detail:`${r.handle} · ${r.followers}K · ${r.niche}`};
+  if(src==="linkedin")return{...r,detail:`${r.role} at ${r.company} · ${r.industry}`};
+  if(src==="tiktok")return{...r,detail:`${r.handle} · ${r.followers}K · ${r.niche}`};
+  if(src==="yelp")return{...r,detail:`${r.type} · ${r.rating}★ · ${r.area}`};
+  return r;
+};
+
+// Filter scrape DB entries BEFORE scanning based on pre-scan filters
+const filterScrapeDB=(src,filters)=>{
+  const items=SCRAPE_DB[src]||[];
+  return items.filter(r=>{
+    if(filters.category!=="all"&&r.category!==filters.category)return false;
+    if(filters.location&&!["area","company","niche","industry","type"].some(k=>r[k]&&r[k].toLowerCase().includes(filters.location.toLowerCase()))&&!r.name.toLowerCase().includes(filters.location.toLowerCase()))return false;
+    if(filters.rating!=="all"){const rt=r.rating||0;if(filters.rating==="4+"&&rt<4)return false;if(filters.rating==="4.5+"&&rt<4.5)return false;}
+    if(filters.followers!=="all"){const fk=r.followers||0;if(filters.followers==="50k+"&&fk<50)return false;if(filters.followers==="100k+"&&fk<100)return false;if(filters.followers==="200k+"&&fk<200)return false;}
+    return true;
+  }).map(r=>fmtScrapeResult(src,r));
 };
 
 // ═══ STYLES ═════════════════════════════════════════════════════════════
@@ -450,10 +514,12 @@ export default function App(){
   const delLead=(id)=>{setLeads(p=>p.filter(l=>l.id!==id));setModal(null);};
   const moveLead=(id,ns)=>setLeads(p=>p.map(l=>l.id===id?{...l,stage:ns,lastContact:new Date().toISOString().slice(0,10)}:l));
 
-  // Scraper
+  // Scraper — filters applied BEFORE scan
   const runScan=(src)=>{
     setScanning(src);setScanRes([]);
-    (SCRAPE_RES[src]||[]).forEach((r,i)=>{setTimeout(()=>{setScanRes(p=>[...p,r]);if(i===(SCRAPE_RES[src]||[]).length-1)setTimeout(()=>setScanning(null),500);},700*(i+1));});
+    const results=filterScrapeDB(src,{category:scCat,location:scLoc,rating:scRating,followers:scFollowers});
+    if(results.length===0){setTimeout(()=>{setScanning(null);setScanRes([]);},800);return;}
+    results.forEach((r,i)=>{setTimeout(()=>{setScanRes(p=>[...p,r]);if(i===results.length-1)setTimeout(()=>setScanning(null),500);},600*(i+1));});
   };
   const importLead=(r)=>{
     if(leads.some(l=>l.email===r.email))return;
@@ -478,14 +544,6 @@ export default function App(){
     setTimeout(()=>{setEmSent(false);setEmTo("");setEmSubj("");setEmBody("");},2500);
   };
 
-  // Scraper filter helpers
-  const filteredScanRes=scanRes.filter(r=>{
-    if(scCat!=="all"&&r.category!==scCat)return false;
-    if(scLoc&&!r.detail.toLowerCase().includes(scLoc.toLowerCase())&&!r.name.toLowerCase().includes(scLoc.toLowerCase()))return false;
-    if(scRating!=="all"){const m=r.detail.match(/([\d.]+)★/);const rt=m?parseFloat(m[1]):0;if(scRating==="4+"&&rt<4)return false;if(scRating==="4.5+"&&rt<4.5)return false;}
-    if(scFollowers!=="all"){const m=r.detail.match(/([\d.]+)K/);const fk=m?parseFloat(m[1]):0;if(scFollowers==="50k+"&&fk<50)return false;if(scFollowers==="100k+"&&fk<100)return false;}
-    return true;
-  });
 
   // DM / AI
   const callAI=async(msgs)=>{try{const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,system:AI_SYS,messages:msgs.map(m=>({role:m.from==="them"?"user":"assistant",content:m.text}))})});const d=await r.json();return d.content?.filter(b=>b.type==="text").map(b=>b.text).join("\n")||"Thanks for reaching out — I'll follow up shortly.";}catch{return"Thanks for reaching out — I'll get back to you with details shortly.";}};
@@ -635,19 +693,31 @@ export default function App(){
 
         {/* ══════════ SCRAPER ══════════ */}
         {v==="scraper"&&(<>
-          <div className="ph"><div><div className="pt">Lead Scraper</div><div className="ps">Scan platforms for potential clients</div></div></div>
-          <div className="sp"><div style={{fontSize:13,fontWeight:700,marginBottom:2}}>Select a Source</div><div style={{fontSize:11,color:"var(--t2)"}}>Click to scan for leads</div>
-            <div className="sp-grid">{[{k:"google_maps",i:"📍",n:"Google Maps",d:"Local businesses"},{k:"instagram",i:"📸",n:"Instagram",d:"Artists & brands"},{k:"linkedin",i:"💼",n:"LinkedIn",d:"Decision makers"},{k:"tiktok",i:"🎵",n:"TikTok",d:"Viral creators"},{k:"yelp",i:"⭐",n:"Yelp",d:"Restaurants & retail"}].map(s=><div key={s.k} className={`sp-c ${scanning===s.k?"scanning":""}`} onClick={()=>!scanning&&runScan(s.k)}><div className="sc-i">{s.i}</div><div className="sc-n">{scanning===s.k?"Scanning…":s.n}</div><div className="sc-d">{s.d}</div></div>)}</div>
-          </div>
-          {scanRes.length>0&&<div className="sp"><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}}><div style={{fontSize:13,fontWeight:700}}>Results ({filteredScanRes.length}{filteredScanRes.length!==scanRes.length?` of ${scanRes.length}`:""})</div><button className="btn btn-s" onClick={()=>{setScLoc("");setScCat("all");setScRating("all");setScFollowers("all");}}>Clear Filters</button></div>
+          <div className="ph"><div><div className="pt">Lead Scraper</div><div className="ps">Set filters, then scan a platform to find leads</div></div></div>
+
+          {/* PRE-SCAN FILTERS */}
+          <div className="sp">
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+              <div><div style={{fontSize:13,fontWeight:700,marginBottom:1}}>Search Filters</div><div style={{fontSize:10.5,color:"var(--t3)"}}>Narrow your scan before searching — results will match these criteria</div></div>
+              {(scLoc||scCat!=="all"||scRating!=="all"||scFollowers!=="all")&&<button className="btn btn-s" onClick={()=>{setScLoc("");setScCat("all");setScRating("all");setScFollowers("all");}}>Reset All</button>}
+            </div>
             <div className="sf-bar">
-              <input className="si" placeholder="Search location or name…" value={scLoc} onChange={e=>setScLoc(e.target.value)}/>
+              <input className="si" placeholder="Location, niche, or keyword…" value={scLoc} onChange={e=>setScLoc(e.target.value)} style={{maxWidth:220}}/>
               <select className="sel" value={scCat} onChange={e=>setScCat(e.target.value)}><option value="all">All Categories</option>{CATS.map(c=><option key={c} value={c}>{CL[c]}</option>)}</select>
               <select className="sel" value={scRating} onChange={e=>setScRating(e.target.value)}><option value="all">Any Rating</option><option value="4+">4+ Stars</option><option value="4.5+">4.5+ Stars</option></select>
-              <select className="sel" value={scFollowers} onChange={e=>setScFollowers(e.target.value)}><option value="all">Any Followers</option><option value="50k+">50K+</option><option value="100k+">100K+</option></select>
+              <select className="sel" value={scFollowers} onChange={e=>setScFollowers(e.target.value)}><option value="all">Any Followers</option><option value="50k+">50K+</option><option value="100k+">100K+</option><option value="200k+">200K+</option></select>
             </div>
-            <div style={{marginTop:10}}>{filteredScanRes.map((r,i)=>{const ex=leads.some(l=>l.email===r.email);return<div className="sr-i" key={i}><div><div className="sn">{r.name}</div><div className="sd">{r.detail} · {r.email}</div></div><button className={`btn btn-s ${ex?"":"btn-p"}`} disabled={ex} onClick={()=>importLead(r)}>{ex?"Added ✓":"+ Import"}</button></div>;})}{filteredScanRes.length===0&&<div style={{textAlign:"center",padding:20,color:"var(--t3)",fontSize:12}}>No results match your filters</div>}</div>
-          </div>}
+            {(scLoc||scCat!=="all"||scRating!=="all"||scFollowers!=="all")&&<div style={{display:"flex",gap:5,flexWrap:"wrap",marginTop:8}}>{scLoc&&<span className="tag" style={{background:"var(--acd)",color:"var(--ac)"}}>📍 {scLoc} <span style={{cursor:"pointer",marginLeft:3}} onClick={()=>setScLoc("")}>×</span></span>}{scCat!=="all"&&<span className="tag" style={{background:"var(--acd)",color:"var(--ac)"}}>{CL[scCat]} <span style={{cursor:"pointer",marginLeft:3}} onClick={()=>setScCat("all")}>×</span></span>}{scRating!=="all"&&<span className="tag" style={{background:"var(--acd)",color:"var(--ac)"}}>{scRating} Stars <span style={{cursor:"pointer",marginLeft:3}} onClick={()=>setScRating("all")}>×</span></span>}{scFollowers!=="all"&&<span className="tag" style={{background:"var(--acd)",color:"var(--ac)"}}>{scFollowers} Followers <span style={{cursor:"pointer",marginLeft:3}} onClick={()=>setScFollowers("all")}>×</span></span>}</div>}
+          </div>
+
+          {/* SOURCE SELECTION */}
+          <div className="sp"><div style={{fontSize:13,fontWeight:700,marginBottom:2}}>Select a Source to Scan</div><div style={{fontSize:11,color:"var(--t2)"}}>Click a platform — your filters above will be applied</div>
+            <div className="sp-grid">{[{k:"google_maps",i:"📍",n:"Google Maps",d:"Local businesses"},{k:"instagram",i:"📸",n:"Instagram",d:"Artists & brands"},{k:"linkedin",i:"💼",n:"LinkedIn",d:"Decision makers"},{k:"tiktok",i:"🎵",n:"TikTok",d:"Viral creators"},{k:"yelp",i:"⭐",n:"Yelp",d:"Restaurants & retail"}].map(s=><div key={s.k} className={`sp-c ${scanning===s.k?"scanning":""}`} onClick={()=>!scanning&&runScan(s.k)}><div className="sc-i">{s.i}</div><div className="sc-n">{scanning===s.k?"Scanning…":s.n}</div><div className="sc-d">{s.d}</div></div>)}</div>
+          </div>
+
+          {/* RESULTS */}
+          {scanRes.length>0&&<div className="sp"><div style={{fontSize:13,fontWeight:700,marginBottom:10}}>Results ({scanRes.length})</div>{scanRes.map((r,i)=>{const ex=leads.some(l=>l.email===r.email);return<div className="sr-i" key={i}><div><div className="sn">{r.name}</div><div className="sd">{r.detail} · {r.email}</div></div><button className={`btn btn-s ${ex?"":"btn-p"}`} disabled={ex} onClick={()=>importLead(r)}>{ex?"Added ✓":"+ Import"}</button></div>;})}</div>}
+          {scanning===null&&scanRes.length===0&&scanning!==undefined&&<div className="sp" style={{textAlign:"center",padding:20,color:"var(--t3)",fontSize:12}}>{scLoc||scCat!=="all"||scRating!=="all"||scFollowers!=="all"?"No results matched your filters on that source. Try adjusting filters or scanning another platform.":""}</div>}
         </>)}
 
         {/* ══════════ OUTREACH ══════════ */}
