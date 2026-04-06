@@ -108,74 +108,209 @@ const INIT_BOOKINGS=[
   {id:"b8",title:"Follow-up — Casa Oaxaca",date:new Date(2026,3,6,11,30),duration:30,type:"follow_up",source:"manual",contact:"Luna Martinez",email:"luna@casaoaxaca.com",phone:"555-0106",category:"restaurant",notes:"Follow up on retainer proposal.",status:"confirmed"},
 ];
 
-// Expanded scrape data with structured fields for pre-scan filtering
+// ═══ EXPANDED SCRAPE DATA — rich fields per platform for deep filtering ═══
 const SCRAPE_DB={
   google_maps:[
-    {name:"Golden Hour Café",type:"Coffee shop",rating:4.7,area:"Downtown",category:"retainer_restaurant",email:"hello@goldenhour.com"},
-    {name:"Midnight Vinyl",type:"Record shop",rating:4.5,area:"Arts District",category:"retainer_vintage",email:"info@midnightvinyl.com"},
-    {name:"Sakura Ramen",type:"Japanese",rating:4.8,area:"Midtown",category:"retainer_restaurant",email:"contact@sakuraramen.com"},
-    {name:"Casa Luna",type:"Mexican",rating:4.3,area:"Silver Lake",category:"retainer_restaurant",email:"info@casaluna.la"},
-    {name:"Epoch Vintage",type:"Vintage clothing",rating:4.6,area:"Echo Park",category:"retainer_vintage",email:"hey@epochvintage.com"},
-    {name:"Nori Bowl",type:"Poke & bowls",rating:4.1,area:"Santa Monica",category:"retainer_restaurant",email:"hello@noribowl.com"},
-    {name:"The Painted Door",type:"Gallery & café",rating:4.9,area:"Arts District",category:"retainer_other",email:"info@painteddoor.la"},
-    {name:"Vinyl & Threads",type:"Vintage + records",rating:3.8,area:"Highland Park",category:"retainer_vintage",email:"shop@vinylthreads.com"},
-    {name:"Fuego Street Tacos",type:"Street food",rating:4.4,area:"Boyle Heights",category:"retainer_restaurant",email:"fuego@streettacos.com"},
-    {name:"Greenhouse Juice",type:"Juice bar",rating:4.2,area:"Venice",category:"retainer_other",email:"hi@greenhousejuice.com"},
+    {name:"Golden Hour Café",type:"Coffee shop",bizType:"restaurant",rating:4.7,reviews:312,area:"Downtown",priceLevel:2,hasSocial:false,hasWebsite:true,category:"retainer_restaurant",email:"hello@goldenhour.com"},
+    {name:"Midnight Vinyl",type:"Record shop",bizType:"retail",rating:4.5,reviews:87,area:"Arts District",priceLevel:2,hasSocial:true,hasWebsite:true,category:"retainer_vintage",email:"info@midnightvinyl.com"},
+    {name:"Sakura Ramen",type:"Japanese",bizType:"restaurant",rating:4.8,reviews:540,area:"Midtown",priceLevel:2,hasSocial:true,hasWebsite:true,category:"retainer_restaurant",email:"contact@sakuraramen.com"},
+    {name:"Casa Luna",type:"Mexican",bizType:"restaurant",rating:4.3,reviews:198,area:"Silver Lake",priceLevel:1,hasSocial:false,hasWebsite:false,category:"retainer_restaurant",email:"info@casaluna.la"},
+    {name:"Epoch Vintage",type:"Vintage clothing",bizType:"retail",rating:4.6,reviews:64,area:"Echo Park",priceLevel:2,hasSocial:true,hasWebsite:true,category:"retainer_vintage",email:"hey@epochvintage.com"},
+    {name:"Nori Bowl",type:"Poke & bowls",bizType:"restaurant",rating:4.1,reviews:156,area:"Santa Monica",priceLevel:1,hasSocial:false,hasWebsite:true,category:"retainer_restaurant",email:"hello@noribowl.com"},
+    {name:"The Painted Door",type:"Gallery & café",bizType:"other",rating:4.9,reviews:73,area:"Arts District",priceLevel:3,hasSocial:true,hasWebsite:true,category:"retainer_other",email:"info@painteddoor.la"},
+    {name:"Vinyl & Threads",type:"Vintage + records",bizType:"retail",rating:3.8,reviews:42,area:"Highland Park",priceLevel:1,hasSocial:false,hasWebsite:false,category:"retainer_vintage",email:"shop@vinylthreads.com"},
+    {name:"Fuego Street Tacos",type:"Street food",bizType:"restaurant",rating:4.4,reviews:820,area:"Boyle Heights",priceLevel:1,hasSocial:false,hasWebsite:false,category:"retainer_restaurant",email:"fuego@streettacos.com"},
+    {name:"Greenhouse Juice",type:"Juice bar",bizType:"restaurant",rating:4.2,reviews:201,area:"Venice",priceLevel:2,hasSocial:true,hasWebsite:true,category:"retainer_other",email:"hi@greenhousejuice.com"},
+    {name:"Studio Barbershop",type:"Barbershop",bizType:"other",rating:4.7,reviews:390,area:"Koreatown",priceLevel:2,hasSocial:false,hasWebsite:false,category:"retainer_other",email:"cuts@studiobarbershop.la"},
+    {name:"Bodega Rosalia",type:"Wine bar & tapas",bizType:"restaurant",rating:4.5,reviews:125,area:"Los Feliz",priceLevel:3,hasSocial:true,hasWebsite:true,category:"retainer_restaurant",email:"hola@bodegarosalia.com"},
   ],
   instagram:[
-    {name:"Jay Monet",handle:"@jaymonet",followers:120,niche:"Hip-hop artist",category:"music_video",email:"mgmt@jaymonet.com"},
-    {name:"Vibe Athletics",handle:"@vibeathletics",followers:85,niche:"Activewear",category:"commercial",email:"collab@vibeathletics.com"},
-    {name:"The Rustic Edit",handle:"@therusticedit",followers:40,niche:"Vintage",category:"retainer_vintage",email:"shop@therusticedit.com"},
-    {name:"Melody Kane",handle:"@melodykane",followers:28,niche:"Indie/pop artist",category:"music_video",email:"mel@melodykane.com"},
-    {name:"Raw Denim Co",handle:"@rawdenimco",followers:150,niche:"Streetwear brand",category:"commercial",email:"brand@rawdenim.co"},
-    {name:"Chef Dominique",handle:"@chefdominique",followers:62,niche:"Chef & restaurant",category:"retainer_restaurant",email:"dom@chefdominique.com"},
-    {name:"Luxe Curated",handle:"@luxecurated",followers:95,niche:"Luxury vintage",category:"retainer_vintage",email:"info@luxecurated.com"},
-    {name:"K.Soto Music",handle:"@ksotomusic",followers:210,niche:"R&B / Soul artist",category:"music_video",email:"mgmt@ksoto.com"},
-    {name:"Bloom Studio",handle:"@bloomstudio",followers:18,niche:"Yoga & wellness",category:"retainer_other",email:"hello@bloomstudio.co"},
-    {name:"Neon Nights",handle:"@neonnightsla",followers:340,niche:"Nightlife brand",category:"commercial",email:"events@neonnights.la"},
+    {name:"Jay Monet",handle:"@jaymonet",followers:120,genre:"Hip-hop",contentType:"musician",verified:false,hasEmail:true,engagement:"high",area:"Los Angeles",category:"music_video",email:"mgmt@jaymonet.com"},
+    {name:"Vibe Athletics",handle:"@vibeathletics",followers:85,genre:"",contentType:"brand",verified:false,hasEmail:true,engagement:"medium",area:"Los Angeles",category:"commercial",email:"collab@vibeathletics.com"},
+    {name:"The Rustic Edit",handle:"@therusticedit",followers:40,genre:"",contentType:"vintage_store",verified:false,hasEmail:true,engagement:"high",area:"Pasadena",category:"retainer_vintage",email:"shop@therusticedit.com"},
+    {name:"Melody Kane",handle:"@melodykane",followers:28,genre:"Indie / Pop",contentType:"musician",verified:false,hasEmail:true,engagement:"high",area:"Silver Lake",category:"music_video",email:"mel@melodykane.com"},
+    {name:"Raw Denim Co",handle:"@rawdenimco",followers:150,genre:"",contentType:"brand",verified:true,hasEmail:true,engagement:"medium",area:"DTLA",category:"commercial",email:"brand@rawdenim.co"},
+    {name:"Chef Dominique",handle:"@chefdominique",followers:62,genre:"",contentType:"restaurant",verified:false,hasEmail:true,engagement:"high",area:"West Hollywood",category:"retainer_restaurant",email:"dom@chefdominique.com"},
+    {name:"Luxe Curated",handle:"@luxecurated",followers:95,genre:"",contentType:"vintage_store",verified:false,hasEmail:true,engagement:"medium",area:"Echo Park",category:"retainer_vintage",email:"info@luxecurated.com"},
+    {name:"K.Soto Music",handle:"@ksotomusic",followers:210,genre:"R&B / Soul",contentType:"musician",verified:true,hasEmail:true,engagement:"high",area:"Inglewood",category:"music_video",email:"mgmt@ksoto.com"},
+    {name:"Bloom Studio",handle:"@bloomstudio",followers:18,genre:"",contentType:"brand",verified:false,hasEmail:true,engagement:"low",area:"Culver City",category:"retainer_other",email:"hello@bloomstudio.co"},
+    {name:"Neon Nights",handle:"@neonnightsla",followers:340,genre:"",contentType:"brand",verified:true,hasEmail:true,engagement:"high",area:"Hollywood",category:"commercial",email:"events@neonnights.la"},
+    {name:"Lil Draco",handle:"@lildracoworld",followers:55,genre:"Trap / Drill",contentType:"musician",verified:false,hasEmail:false,engagement:"medium",area:"Compton",category:"music_video",email:""},
+    {name:"Aria Voss",handle:"@ariavossmusic",followers:430,genre:"Pop / Electronic",contentType:"musician",verified:true,hasEmail:true,engagement:"high",area:"Santa Monica",category:"music_video",email:"team@ariavoss.com"},
+    {name:"Slow Pour Coffee",handle:"@slowpourcoffee",followers:12,genre:"",contentType:"restaurant",verified:false,hasEmail:true,engagement:"medium",area:"Eagle Rock",category:"retainer_restaurant",email:"hello@slowpour.co"},
+    {name:"D. Marcus",handle:"@dmarcusofficial",followers:8,genre:"Afrobeats",contentType:"musician",verified:false,hasEmail:true,engagement:"low",area:"Inglewood",category:"music_video",email:"dmarcus@email.com"},
   ],
   linkedin:[
-    {name:"Rachel Kim",role:"Marketing Dir",company:"FreshBrew Co",industry:"Beverage",category:"commercial",email:"rachel@freshbrew.co"},
-    {name:"Daniel Okafor",role:"CEO",company:"StreetVault Vintage",industry:"Retail",category:"retainer_vintage",email:"daniel@streetvault.com"},
-    {name:"Maria Gonzalez",role:"Owner",company:"Cantina Sol",industry:"Restaurant",category:"retainer_restaurant",email:"maria@cantinasol.com"},
-    {name:"Jason Park",role:"Brand Manager",company:"Halo Spirits",industry:"Beverage",category:"commercial",email:"jason@halospirits.com"},
-    {name:"Tanya Rivera",role:"Founder",company:"Nostalgia Threads",industry:"Retail",category:"retainer_vintage",email:"tanya@nostalgiathreads.com"},
-    {name:"Chris Adler",role:"VP Marketing",company:"Prism Fitness",industry:"Fitness",category:"commercial",email:"chris@prismfit.com"},
+    {name:"Rachel Kim",role:"Marketing Dir",seniority:"director",company:"FreshBrew Co",companySize:"51-200",industry:"Beverage",category:"commercial",email:"rachel@freshbrew.co"},
+    {name:"Daniel Okafor",role:"CEO",seniority:"c_suite",company:"StreetVault Vintage",companySize:"1-10",industry:"Retail",category:"retainer_vintage",email:"daniel@streetvault.com"},
+    {name:"Maria Gonzalez",role:"Owner",seniority:"c_suite",company:"Cantina Sol",companySize:"11-50",industry:"Restaurant",category:"retainer_restaurant",email:"maria@cantinasol.com"},
+    {name:"Jason Park",role:"Brand Manager",seniority:"manager",company:"Halo Spirits",companySize:"51-200",industry:"Beverage",category:"commercial",email:"jason@halospirits.com"},
+    {name:"Tanya Rivera",role:"Founder",seniority:"c_suite",company:"Nostalgia Threads",companySize:"1-10",industry:"Retail",category:"retainer_vintage",email:"tanya@nostalgiathreads.com"},
+    {name:"Chris Adler",role:"VP Marketing",seniority:"vp",company:"Prism Fitness",companySize:"201-500",industry:"Fitness",category:"commercial",email:"chris@prismfit.com"},
+    {name:"Layla Hassan",role:"Creative Director",seniority:"director",company:"Oasis Records",companySize:"11-50",industry:"Music & Entertainment",category:"music_video",email:"layla@oasisrecords.com"},
+    {name:"Marcus Webb",role:"A&R Manager",seniority:"manager",company:"Sunset Sound Label",companySize:"11-50",industry:"Music & Entertainment",category:"music_video",email:"marcus@sunsetsound.co"},
+    {name:"Nina Patel",role:"Head of Content",seniority:"director",company:"Glow Beauty Co",companySize:"51-200",industry:"Beauty & Cosmetics",category:"commercial",email:"nina@glowbeauty.com"},
+    {name:"Eric Foster",role:"Owner",seniority:"c_suite",company:"Foster's Vintage Finds",companySize:"1-10",industry:"Retail",category:"retainer_vintage",email:"eric@fostersvintage.com"},
   ],
   tiktok:[
-    {name:"Kira Nova",handle:"@kiranova",followers:500,niche:"Pop artist",category:"music_video",email:"booking@kiranova.com"},
-    {name:"Drip Society",handle:"@dripsociety",followers:220,niche:"Streetwear",category:"commercial",email:"brand@dripsociety.com"},
-    {name:"AJ Flames",handle:"@ajflames",followers:78,niche:"Rapper",category:"music_video",email:"aj@ajflames.com"},
-    {name:"Faded Goods",handle:"@fadedgoods",followers:145,niche:"Vintage reseller",category:"retainer_vintage",email:"hi@fadedgoods.com"},
-    {name:"Bao House",handle:"@baohousela",followers:52,niche:"Restaurant",category:"retainer_restaurant",email:"eat@baohouse.la"},
+    {name:"Kira Nova",handle:"@kiranova",followers:500,genre:"Pop",contentType:"musician",verified:true,avgViews:85,area:"Los Angeles",category:"music_video",email:"booking@kiranova.com"},
+    {name:"Drip Society",handle:"@dripsociety",followers:220,genre:"",contentType:"brand",verified:false,avgViews:45,area:"DTLA",category:"commercial",email:"brand@dripsociety.com"},
+    {name:"AJ Flames",handle:"@ajflames",followers:78,genre:"Rap",contentType:"musician",verified:false,avgViews:22,area:"South LA",category:"music_video",email:"aj@ajflames.com"},
+    {name:"Faded Goods",handle:"@fadedgoods",followers:145,genre:"",contentType:"vintage_store",verified:false,avgViews:38,area:"Long Beach",category:"retainer_vintage",email:"hi@fadedgoods.com"},
+    {name:"Bao House",handle:"@baohousela",followers:52,genre:"",contentType:"restaurant",verified:false,avgViews:15,area:"SGV",category:"retainer_restaurant",email:"eat@baohouse.la"},
+    {name:"22Savage",handle:"@22savagetok",followers:310,genre:"Drill",contentType:"musician",verified:false,avgViews:120,area:"Inglewood",category:"music_video",email:"mgmt@22savage.co"},
+    {name:"Velvet Rose",handle:"@velvetrosesings",followers:180,genre:"R&B / Neo-soul",contentType:"musician",verified:true,avgViews:60,area:"Pasadena",category:"music_video",email:"booking@velvetrose.la"},
+    {name:"Throwback Alley",handle:"@throwbackalley",followers:92,genre:"",contentType:"vintage_store",verified:false,avgViews:28,area:"Venice",category:"retainer_vintage",email:"shop@throwbackalley.com"},
   ],
   yelp:[
-    {name:"Ember & Oak",type:"New American",rating:4.6,area:"West Side",category:"retainer_restaurant",email:"events@emberandoak.com"},
-    {name:"Thrift & Thread",type:"Vintage",rating:4.4,area:"East Village",category:"retainer_vintage",email:"hello@thriftthread.com"},
-    {name:"Pho District",type:"Vietnamese",rating:4.7,area:"Chinatown",category:"retainer_restaurant",email:"info@phodistrict.la"},
-    {name:"Retro Luxe",type:"Vintage boutique",rating:4.2,area:"Los Feliz",category:"retainer_vintage",email:"shop@retroluxe.com"},
-    {name:"Wild Flour Bakery",type:"Bakery & café",rating:4.8,area:"Culver City",category:"retainer_restaurant",email:"bake@wildflour.com"},
+    {name:"Ember & Oak",type:"New American",bizType:"restaurant",rating:4.6,reviews:280,area:"West Side",priceLevel:3,claimed:true,category:"retainer_restaurant",email:"events@emberandoak.com"},
+    {name:"Thrift & Thread",type:"Vintage",bizType:"retail",rating:4.4,reviews:55,area:"East Village",priceLevel:1,claimed:false,category:"retainer_vintage",email:"hello@thriftthread.com"},
+    {name:"Pho District",type:"Vietnamese",bizType:"restaurant",rating:4.7,reviews:620,area:"Chinatown",priceLevel:1,claimed:true,category:"retainer_restaurant",email:"info@phodistrict.la"},
+    {name:"Retro Luxe",type:"Vintage boutique",bizType:"retail",rating:4.2,reviews:33,area:"Los Feliz",priceLevel:2,claimed:false,category:"retainer_vintage",email:"shop@retroluxe.com"},
+    {name:"Wild Flour Bakery",type:"Bakery & café",bizType:"restaurant",rating:4.8,reviews:410,area:"Culver City",priceLevel:2,claimed:true,category:"retainer_restaurant",email:"bake@wildflour.com"},
+    {name:"Good Vibes Taqueria",type:"Mexican",bizType:"restaurant",rating:4.3,reviews:190,area:"Highland Park",priceLevel:1,claimed:false,category:"retainer_restaurant",email:"order@goodvibetacos.com"},
+    {name:"Archive Selects",type:"Vintage resale",bizType:"retail",rating:4.1,reviews:27,area:"Silver Lake",priceLevel:2,claimed:true,category:"retainer_vintage",email:"info@archiveselects.com"},
+    {name:"Olive & Thyme",type:"Mediterranean",bizType:"restaurant",rating:4.5,reviews:350,area:"Burbank",priceLevel:2,claimed:true,category:"retainer_restaurant",email:"eat@oliveandthyme.la"},
   ],
 };
 
 // Format scrape results for display based on source type
 const fmtScrapeResult=(src,r)=>{
-  if(src==="google_maps")return{...r,detail:`${r.type} · ${r.rating}★ · ${r.area}`};
-  if(src==="instagram")return{...r,detail:`${r.handle} · ${r.followers}K · ${r.niche}`};
-  if(src==="linkedin")return{...r,detail:`${r.role} at ${r.company} · ${r.industry}`};
-  if(src==="tiktok")return{...r,detail:`${r.handle} · ${r.followers}K · ${r.niche}`};
-  if(src==="yelp")return{...r,detail:`${r.type} · ${r.rating}★ · ${r.area}`};
+  if(src==="google_maps"){
+    const parts=[r.type,`${r.rating}★ (${r.reviews})`,r.area];
+    if(!r.hasSocial)parts.push("No social");
+    return{...r,detail:parts.join(" · ")};
+  }
+  if(src==="instagram"){
+    const parts=[r.handle,`${r.followers}K`,r.genre||r.contentType.replace("_"," ")];
+    if(r.verified)parts.push("Verified ✓");
+    if(r.engagement==="high")parts.push("High engagement");
+    return{...r,detail:parts.join(" · ")};
+  }
+  if(src==="linkedin"){
+    return{...r,detail:`${r.role} at ${r.company} · ${r.industry} · ${r.companySize} employees`};
+  }
+  if(src==="tiktok"){
+    const parts=[r.handle,`${r.followers}K followers`,`~${r.avgViews}K avg views`];
+    if(r.genre)parts.push(r.genre);
+    if(r.verified)parts.push("Verified ✓");
+    return{...r,detail:parts.join(" · ")};
+  }
+  if(src==="yelp"){
+    const parts=[r.type,`${r.rating}★ (${r.reviews})`,r.area,"$".repeat(r.priceLevel)];
+    if(!r.claimed)parts.push("Unclaimed");
+    return{...r,detail:parts.join(" · ")};
+  }
   return r;
 };
 
-// Filter scrape DB entries BEFORE scanning based on pre-scan filters
+// Source-specific filter definitions — controls what UI shows for each source
+const SRC_FILTERS={
+  google_maps:{label:"Google Maps",filters:[
+    {key:"area",type:"select",label:"Area / Neighborhood",options:["all","Downtown","Arts District","Midtown","Silver Lake","Echo Park","Santa Monica","Highland Park","Boyle Heights","Venice","Koreatown","Los Feliz"],allLabel:"All Areas"},
+    {key:"bizType",type:"select",label:"Business Type",options:["all","restaurant","retail","other"],labels:{restaurant:"Restaurant / Food",retail:"Retail / Vintage",other:"Other"},allLabel:"All Types"},
+    {key:"rating",type:"select",label:"Min Rating",options:["all","3.5+","4+","4.5+"],allLabel:"Any Rating"},
+    {key:"priceLevel",type:"select",label:"Price Level",options:["all","1","2","3"],labels:{"1":"$ Budget","2":"$$ Moderate","3":"$$$ Premium"},allLabel:"Any Price"},
+    {key:"hasSocial",type:"select",label:"Social Presence",options:["all","yes","no"],labels:{"yes":"Has Social Media","no":"No Social (Opportunity!)"},allLabel:"Any"},
+    {key:"hasWebsite",type:"select",label:"Has Website",options:["all","yes","no"],labels:{"yes":"Has Website","no":"No Website"},allLabel:"Any"},
+  ]},
+  instagram:{label:"Instagram",filters:[
+    {key:"contentType",type:"select",label:"Account Type",options:["all","musician","brand","restaurant","vintage_store"],labels:{musician:"Musician / Artist",brand:"Brand / Company",restaurant:"Restaurant / Chef",vintage_store:"Vintage Store"},allLabel:"All Types"},
+    {key:"genre",type:"select",label:"Music Genre",options:["all","Hip-hop","R&B / Soul","Indie / Pop","Pop / Electronic","Trap / Drill","Afrobeats"],allLabel:"Any Genre",showWhen:"musician"},
+    {key:"followers",type:"select",label:"Follower Range",options:["all","under25k","25k-100k","100k-500k","500k+"],labels:{"under25k":"Under 25K (Emerging)","25k-100k":"25K-100K (Growing)","100k-500k":"100K-500K (Established)","500k+":"500K+ (Major)"},allLabel:"Any Followers"},
+    {key:"engagement",type:"select",label:"Engagement Level",options:["all","high","medium","low"],labels:{high:"High Engagement",medium:"Medium Engagement",low:"Low Engagement"},allLabel:"Any Engagement"},
+    {key:"verified",type:"select",label:"Verified",options:["all","yes","no"],labels:{"yes":"Verified Only","no":"Unverified Only"},allLabel:"Any"},
+    {key:"hasEmail",type:"select",label:"Email Available",options:["all","yes","no"],labels:{"yes":"Has Email","no":"No Email"},allLabel:"Any"},
+    {key:"area",type:"select",label:"Location",options:["all","Los Angeles","Silver Lake","DTLA","Echo Park","Hollywood","Santa Monica","Inglewood","Pasadena","Culver City","Compton","Eagle Rock"],allLabel:"All Locations"},
+  ]},
+  linkedin:{label:"LinkedIn",filters:[
+    {key:"industry",type:"select",label:"Industry",options:["all","Beverage","Retail","Restaurant","Fitness","Beauty & Cosmetics","Music & Entertainment"],allLabel:"All Industries"},
+    {key:"seniority",type:"select",label:"Seniority Level",options:["all","c_suite","vp","director","manager"],labels:{c_suite:"C-Suite (CEO/Founder/Owner)",vp:"VP Level",director:"Director Level",manager:"Manager Level"},allLabel:"Any Seniority"},
+    {key:"companySize",type:"select",label:"Company Size",options:["all","1-10","11-50","51-200","201-500"],labels:{"1-10":"1-10 (Small Biz)","11-50":"11-50 (Growing)","51-200":"51-200 (Mid-Size)","201-500":"201-500 (Large)"},allLabel:"Any Size"},
+    {key:"category",type:"select",label:"Project Type",options:["all","music_video","commercial","retainer_vintage","retainer_restaurant"],labels:{music_video:"Music Video",commercial:"Commercial",retainer_vintage:"Vintage Retainer",retainer_restaurant:"Restaurant Retainer"},allLabel:"All Types"},
+  ]},
+  tiktok:{label:"TikTok",filters:[
+    {key:"contentType",type:"select",label:"Account Type",options:["all","musician","brand","restaurant","vintage_store"],labels:{musician:"Musician / Artist",brand:"Brand / Company",restaurant:"Restaurant",vintage_store:"Vintage Store"},allLabel:"All Types"},
+    {key:"genre",type:"select",label:"Music Genre",options:["all","Pop","Rap","Drill","R&B / Neo-soul"],allLabel:"Any Genre",showWhen:"musician"},
+    {key:"followers",type:"select",label:"Follower Range",options:["all","under50k","50k-200k","200k-500k","500k+"],labels:{"under50k":"Under 50K","50k-200k":"50K-200K","200k-500k":"200K-500K","500k+":"500K+"},allLabel:"Any Followers"},
+    {key:"avgViews",type:"select",label:"Avg Views / Video",options:["all","10k+","25k+","50k+","100k+"],allLabel:"Any Views"},
+    {key:"verified",type:"select",label:"Verified",options:["all","yes","no"],labels:{"yes":"Verified Only","no":"Unverified Only"},allLabel:"Any"},
+    {key:"area",type:"select",label:"Location",options:["all","Los Angeles","DTLA","South LA","Inglewood","Long Beach","SGV","Pasadena","Venice"],allLabel:"All Locations"},
+  ]},
+  yelp:{label:"Yelp",filters:[
+    {key:"bizType",type:"select",label:"Business Type",options:["all","restaurant","retail"],labels:{restaurant:"Restaurant / Food",retail:"Retail / Vintage"},allLabel:"All Types"},
+    {key:"area",type:"select",label:"Area / Neighborhood",options:["all","West Side","East Village","Chinatown","Los Feliz","Culver City","Highland Park","Silver Lake","Burbank"],allLabel:"All Areas"},
+    {key:"rating",type:"select",label:"Min Rating",options:["all","3.5+","4+","4.5+"],allLabel:"Any Rating"},
+    {key:"priceLevel",type:"select",label:"Price Level",options:["all","1","2","3"],labels:{"1":"$ Budget","2":"$$ Moderate","3":"$$$ Premium"},allLabel:"Any Price"},
+    {key:"claimed",type:"select",label:"Listing Status",options:["all","claimed","unclaimed"],labels:{claimed:"Claimed",unclaimed:"Unclaimed (Opportunity!)"},allLabel:"Any Status"},
+    {key:"reviews",type:"select",label:"Review Count",options:["all","under50","50-200","200+"],labels:{"under50":"Under 50 (New/Small)","50-200":"50-200 (Established)","200+":"200+ (Popular)"},allLabel:"Any"},
+  ]},
+};
+
+// Filter scrape DB entries BEFORE scanning — source-aware deep filtering
 const filterScrapeDB=(src,filters)=>{
   const items=SCRAPE_DB[src]||[];
   return items.filter(r=>{
-    if(filters.category!=="all"&&r.category!==filters.category)return false;
-    if(filters.location&&!["area","company","niche","industry","type"].some(k=>r[k]&&r[k].toLowerCase().includes(filters.location.toLowerCase()))&&!r.name.toLowerCase().includes(filters.location.toLowerCase()))return false;
-    if(filters.rating!=="all"){const rt=r.rating||0;if(filters.rating==="4+"&&rt<4)return false;if(filters.rating==="4.5+"&&rt<4.5)return false;}
-    if(filters.followers!=="all"){const fk=r.followers||0;if(filters.followers==="50k+"&&fk<50)return false;if(filters.followers==="100k+"&&fk<100)return false;if(filters.followers==="200k+"&&fk<200)return false;}
+    for(const[k,v]of Object.entries(filters)){
+      if(!v||v==="all")continue;
+      // ── Text search ──
+      if(k==="search"){
+        const q=v.toLowerCase();
+        const searchable=[r.name,r.type,r.area,r.handle,r.genre,r.company,r.industry,r.role,r.contentType].filter(Boolean);
+        if(!searchable.some(s=>s.toLowerCase().includes(q)))return false;
+        continue;
+      }
+      // ── Rating (threshold) ──
+      if(k==="rating"){
+        const min=parseFloat(v);
+        if((r.rating||0)<min)return false;
+        continue;
+      }
+      // ── Price level ──
+      if(k==="priceLevel"){
+        if((r.priceLevel||0)!==parseInt(v))return false;
+        continue;
+      }
+      // ── Followers (range) ──
+      if(k==="followers"){
+        const f=r.followers||0;
+        if(v==="under25k"&&f>=25)return false;
+        if(v==="25k-100k"&&(f<25||f>100))return false;
+        if(v==="100k-500k"&&(f<100||f>500))return false;
+        if(v==="500k+"&&f<500)return false;
+        if(v==="under50k"&&f>=50)return false;
+        if(v==="50k-200k"&&(f<50||f>200))return false;
+        if(v==="200k-500k"&&(f<200||f>500))return false;
+        continue;
+      }
+      // ── Avg views (threshold) ──
+      if(k==="avgViews"){
+        const min=parseInt(v);
+        if((r.avgViews||0)<min)return false;
+        continue;
+      }
+      // ── Reviews count (range) ──
+      if(k==="reviews"){
+        const rv=r.reviews||0;
+        if(v==="under50"&&rv>=50)return false;
+        if(v==="50-200"&&(rv<50||rv>200))return false;
+        if(v==="200+"&&rv<200)return false;
+        continue;
+      }
+      // ── Booleans (hasSocial, hasWebsite, hasEmail, verified, claimed) ──
+      if(k==="hasSocial"||k==="hasWebsite"||k==="hasEmail"||k==="verified"){
+        const boolVal=v==="yes";
+        if((!!r[k])!==boolVal)return false;
+        continue;
+      }
+      if(k==="claimed"){
+        if(v==="claimed"&&!r.claimed)return false;
+        if(v==="unclaimed"&&r.claimed)return false;
+        continue;
+      }
+      // ── Exact match for everything else (area, bizType, contentType, genre, industry, seniority, companySize, category) ──
+      if(r[k]!==undefined&&r[k]!==v)return false;
+    }
     return true;
   }).map(r=>fmtScrapeResult(src,r));
 };
@@ -366,9 +501,10 @@ tbody tr:last-child td{border-bottom:none;}
 /* Scraper */
 .sp{background:var(--s1);border:1px solid var(--b);border-radius:var(--rl);padding:18px;margin-bottom:20px;}
 .sp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;}
-.sp-c{background:var(--s2);border:1px solid var(--b);border-radius:var(--r);padding:12px;text-align:center;cursor:pointer;transition:all .1s;}
-.sp-c:hover{border-color:var(--ac);}
+.sp-c{background:var(--s2);border:1px solid var(--b);border-radius:var(--r);padding:12px;text-align:center;cursor:pointer;transition:all .15s;}
+.sp-c:hover{border-color:var(--ac);background:var(--s3);}
 .sp-c.scanning{border-color:var(--ac);}
+.sp-c.sp-c-active{border-color:var(--ac);background:var(--acd);box-shadow:0 0 0 1px var(--ac);}
 .sp-c .sc-i{font-size:24px;margin-bottom:4px;}
 .sp-c .sc-n{font-size:12px;font-weight:700;margin-bottom:2px;}
 .sp-c .sc-d{font-size:10px;color:var(--t3);}
@@ -451,11 +587,9 @@ export default function App(){
   const [scanning,setScanning]=useState(null);
   const [scanRes,setScanRes]=useState([]);
   const [copied,setCopied]=useState(false);
-  // Scraper filters
-  const [scLoc,setScLoc]=useState("");
-  const [scCat,setScCat]=useState("all");
-  const [scRating,setScRating]=useState("all");
-  const [scFollowers,setScFollowers]=useState("all");
+  // Scraper — source-first, then dynamic filters
+  const [scSrc,setScSrc]=useState(null); // selected source before scan
+  const [scFilters,setScFilters]=useState({}); // dynamic filters per source
   // Email composer
   const [emTab,setEmTab]=useState("template"); // template | compose
   const [emTo,setEmTo]=useState("");
@@ -514,16 +648,21 @@ export default function App(){
   const delLead=(id)=>{setLeads(p=>p.filter(l=>l.id!==id));setModal(null);};
   const moveLead=(id,ns)=>setLeads(p=>p.map(l=>l.id===id?{...l,stage:ns,lastContact:new Date().toISOString().slice(0,10)}:l));
 
-  // Scraper — filters applied BEFORE scan
-  const runScan=(src)=>{
-    setScanning(src);setScanRes([]);
-    const results=filterScrapeDB(src,{category:scCat,location:scLoc,rating:scRating,followers:scFollowers});
+  // Scraper — filters applied BEFORE scan, source-aware
+  const setScFilter=(key,val)=>setScFilters(p=>({...p,[key]:val}));
+  const resetScFilters=()=>setScFilters({});
+  const activeFilterCount=Object.values(scFilters).filter(v=>v&&v!=="all").length;
+  const selectScSource=(src)=>{setScSrc(src);setScFilters({});setScanRes([]);setScanning(null);};
+  const runScan=()=>{
+    if(!scSrc)return;
+    setScanning(scSrc);setScanRes([]);
+    const results=filterScrapeDB(scSrc,scFilters);
     if(results.length===0){setTimeout(()=>{setScanning(null);setScanRes([]);},800);return;}
     results.forEach((r,i)=>{setTimeout(()=>{setScanRes(p=>[...p,r]);if(i===results.length-1)setTimeout(()=>setScanning(null),500);},600*(i+1));});
   };
   const importLead=(r)=>{
     if(leads.some(l=>l.email===r.email))return;
-    setLeads(p=>[...p,{id:Date.now()+Math.random(),name:r.name,company:r.detail.split("·")[0].trim(),email:r.email,phone:"",source:scanning||"manual",category:r.category,stage:"cold",notes:r.detail,lastContact:null,created:new Date().toISOString().slice(0,10)}]);
+    setLeads(p=>[...p,{id:Date.now()+Math.random(),name:r.name,company:r.detail.split("·")[0].trim(),email:r.email,phone:"",source:scSrc||scanning||"manual",category:r.category,stage:"cold",notes:r.detail,lastContact:null,created:new Date().toISOString().slice(0,10)}]);
   };
 
   // Outreach
@@ -693,31 +832,61 @@ export default function App(){
 
         {/* ══════════ SCRAPER ══════════ */}
         {v==="scraper"&&(<>
-          <div className="ph"><div><div className="pt">Lead Scraper</div><div className="ps">Set filters, then scan a platform to find leads</div></div></div>
+          <div className="ph"><div><div className="pt">Lead Scraper</div><div className="ps">Choose a source, set your filters, then scan</div></div></div>
 
-          {/* PRE-SCAN FILTERS */}
+          {/* STEP 1 — SOURCE SELECTION */}
           <div className="sp">
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-              <div><div style={{fontSize:13,fontWeight:700,marginBottom:1}}>Search Filters</div><div style={{fontSize:10.5,color:"var(--t3)"}}>Narrow your scan before searching — results will match these criteria</div></div>
-              {(scLoc||scCat!=="all"||scRating!=="all"||scFollowers!=="all")&&<button className="btn btn-s" onClick={()=>{setScLoc("");setScCat("all");setScRating("all");setScFollowers("all");}}>Reset All</button>}
-            </div>
-            <div className="sf-bar">
-              <input className="si" placeholder="Location, niche, or keyword…" value={scLoc} onChange={e=>setScLoc(e.target.value)} style={{maxWidth:220}}/>
-              <select className="sel" value={scCat} onChange={e=>setScCat(e.target.value)}><option value="all">All Categories</option>{CATS.map(c=><option key={c} value={c}>{CL[c]}</option>)}</select>
-              <select className="sel" value={scRating} onChange={e=>setScRating(e.target.value)}><option value="all">Any Rating</option><option value="4+">4+ Stars</option><option value="4.5+">4.5+ Stars</option></select>
-              <select className="sel" value={scFollowers} onChange={e=>setScFollowers(e.target.value)}><option value="all">Any Followers</option><option value="50k+">50K+</option><option value="100k+">100K+</option><option value="200k+">200K+</option></select>
-            </div>
-            {(scLoc||scCat!=="all"||scRating!=="all"||scFollowers!=="all")&&<div style={{display:"flex",gap:5,flexWrap:"wrap",marginTop:8}}>{scLoc&&<span className="tag" style={{background:"var(--acd)",color:"var(--ac)"}}>📍 {scLoc} <span style={{cursor:"pointer",marginLeft:3}} onClick={()=>setScLoc("")}>×</span></span>}{scCat!=="all"&&<span className="tag" style={{background:"var(--acd)",color:"var(--ac)"}}>{CL[scCat]} <span style={{cursor:"pointer",marginLeft:3}} onClick={()=>setScCat("all")}>×</span></span>}{scRating!=="all"&&<span className="tag" style={{background:"var(--acd)",color:"var(--ac)"}}>{scRating} Stars <span style={{cursor:"pointer",marginLeft:3}} onClick={()=>setScRating("all")}>×</span></span>}{scFollowers!=="all"&&<span className="tag" style={{background:"var(--acd)",color:"var(--ac)"}}>{scFollowers} Followers <span style={{cursor:"pointer",marginLeft:3}} onClick={()=>setScFollowers("all")}>×</span></span>}</div>}
+            <div style={{fontSize:13,fontWeight:700,marginBottom:2}}>1. Select a Source</div>
+            <div style={{fontSize:10.5,color:"var(--t3)",marginBottom:10}}>Each source has its own set of filters</div>
+            <div className="sp-grid">{[{k:"google_maps",i:"📍",n:"Google Maps",d:"Local businesses"},{k:"instagram",i:"📸",n:"Instagram",d:"Artists & brands"},{k:"linkedin",i:"💼",n:"LinkedIn",d:"Decision makers"},{k:"tiktok",i:"🎵",n:"TikTok",d:"Viral creators"},{k:"yelp",i:"⭐",n:"Yelp",d:"Restaurants & retail"}].map(s=><div key={s.k} className={`sp-c ${scSrc===s.k?"sp-c-active":""}`} onClick={()=>selectScSource(s.k)}><div className="sc-i">{s.i}</div><div className="sc-n">{s.n}</div><div className="sc-d">{s.d}</div></div>)}</div>
           </div>
 
-          {/* SOURCE SELECTION */}
-          <div className="sp"><div style={{fontSize:13,fontWeight:700,marginBottom:2}}>Select a Source to Scan</div><div style={{fontSize:11,color:"var(--t2)"}}>Click a platform — your filters above will be applied</div>
-            <div className="sp-grid">{[{k:"google_maps",i:"📍",n:"Google Maps",d:"Local businesses"},{k:"instagram",i:"📸",n:"Instagram",d:"Artists & brands"},{k:"linkedin",i:"💼",n:"LinkedIn",d:"Decision makers"},{k:"tiktok",i:"🎵",n:"TikTok",d:"Viral creators"},{k:"yelp",i:"⭐",n:"Yelp",d:"Restaurants & retail"}].map(s=><div key={s.k} className={`sp-c ${scanning===s.k?"scanning":""}`} onClick={()=>!scanning&&runScan(s.k)}><div className="sc-i">{s.i}</div><div className="sc-n">{scanning===s.k?"Scanning…":s.n}</div><div className="sc-d">{s.d}</div></div>)}</div>
-          </div>
+          {/* STEP 2 — DYNAMIC FILTERS (shown after source selection) */}
+          {scSrc&&SRC_FILTERS[scSrc]&&(<div className="sp">
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+              <div>
+                <div style={{fontSize:13,fontWeight:700,marginBottom:1}}>2. Filter {SRC_FILTERS[scSrc].label} Results</div>
+                <div style={{fontSize:10.5,color:"var(--t3)"}}>Set criteria before scanning — only matching leads will appear</div>
+              </div>
+              <div style={{display:"flex",gap:6,alignItems:"center"}}>
+                {activeFilterCount>0&&<button className="btn btn-s" onClick={resetScFilters}>Reset All ({activeFilterCount})</button>}
+              </div>
+            </div>
+            {/* Search bar */}
+            <div style={{marginBottom:10}}>
+              <input className="si" placeholder="Search by name, keyword, location…" value={scFilters.search||""} onChange={e=>setScFilter("search",e.target.value)} style={{width:"100%",maxWidth:400}}/>
+            </div>
+            {/* Dynamic filter dropdowns */}
+            <div className="sf-bar" style={{flexWrap:"wrap"}}>
+              {SRC_FILTERS[scSrc].filters.map(f=>{
+                // Conditional visibility: genre filter only shows when contentType is "musician"
+                if(f.showWhen&&scFilters.contentType!==f.showWhen)return null;
+                return <select key={f.key} className="sel" value={scFilters[f.key]||"all"} onChange={e=>setScFilter(f.key,e.target.value)}>
+                  <option value="all">{f.allLabel}</option>
+                  {f.options.filter(o=>o!=="all").map(o=><option key={o} value={o}>{f.labels?.[o]||o}</option>)}
+                </select>;
+              })}
+            </div>
+            {/* Active filter tags */}
+            {activeFilterCount>0&&<div style={{display:"flex",gap:5,flexWrap:"wrap",marginTop:8}}>
+              {Object.entries(scFilters).filter(([k,v])=>v&&v!=="all").map(([k,v])=>{
+                const fDef=SRC_FILTERS[scSrc].filters.find(f=>f.key===k);
+                const label=k==="search"?`"${v}"`:fDef?.labels?.[v]||v;
+                const icon=k==="area"?"📍":k==="genre"?"🎵":k==="search"?"🔍":"";
+                return <span key={k} className="tag" style={{background:"var(--acd)",color:"var(--ac)"}}>{icon}{icon?" ":""}{fDef?.label||k}: {label} <span style={{cursor:"pointer",marginLeft:4,opacity:.7}} onClick={()=>setScFilter(k,"all")}>×</span></span>;
+              })}
+            </div>}
+            {/* SCAN BUTTON */}
+            <div style={{marginTop:14}}>
+              <button className={`btn btn-p ${scanning?"":""}`} disabled={!!scanning} onClick={runScan} style={{padding:"8px 22px",fontSize:13}}>
+                {scanning===scSrc?"⏳ Scanning…":`Scan ${SRC_FILTERS[scSrc].label}`} {activeFilterCount>0?`(${activeFilterCount} filter${activeFilterCount>1?"s":""})`:""}
+              </button>
+            </div>
+          </div>)}
 
           {/* RESULTS */}
-          {scanRes.length>0&&<div className="sp"><div style={{fontSize:13,fontWeight:700,marginBottom:10}}>Results ({scanRes.length})</div>{scanRes.map((r,i)=>{const ex=leads.some(l=>l.email===r.email);return<div className="sr-i" key={i}><div><div className="sn">{r.name}</div><div className="sd">{r.detail} · {r.email}</div></div><button className={`btn btn-s ${ex?"":"btn-p"}`} disabled={ex} onClick={()=>importLead(r)}>{ex?"Added ✓":"+ Import"}</button></div>;})}</div>}
-          {scanning===null&&scanRes.length===0&&scanning!==undefined&&<div className="sp" style={{textAlign:"center",padding:20,color:"var(--t3)",fontSize:12}}>{scLoc||scCat!=="all"||scRating!=="all"||scFollowers!=="all"?"No results matched your filters on that source. Try adjusting filters or scanning another platform.":""}</div>}
+          {scanRes.length>0&&<div className="sp"><div style={{fontSize:13,fontWeight:700,marginBottom:10}}>Results ({scanRes.length})</div>{scanRes.map((r,i)=>{const ex=leads.some(l=>l.email===r.email);return<div className="sr-i" key={i}><div><div className="sn">{r.name}</div><div className="sd">{r.detail}{r.email?" · "+r.email:""}</div></div>{r.email?<button className={`btn btn-s ${ex?"":"btn-p"}`} disabled={ex} onClick={()=>importLead(r)}>{ex?"Added ✓":"+ Import"}</button>:<span style={{fontSize:10,color:"var(--t3)"}}>No email</span>}</div>;})}</div>}
+          {scanning===null&&scanRes.length===0&&scSrc&&<div className="sp" style={{textAlign:"center",padding:20,color:"var(--t3)",fontSize:12}}>{activeFilterCount>0?"No results matched your filters. Try adjusting or resetting filters.":""}</div>}
         </>)}
 
         {/* ══════════ OUTREACH ══════════ */}
