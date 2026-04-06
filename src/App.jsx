@@ -606,6 +606,21 @@ export default function App(){
   const [aiLoad,setAiLoad]=useState(false);
   const [pFilt,setPFilt]=useState("all");
   const [sFilt,setSFilt]=useState("all");
+  // ManyChat integration
+  const [mcKey,setMcKey]=useState(()=>{ try{return localStorage.getItem("mc_key")||"";}catch{return "";} });
+  const [mcConnected,setMcConnected]=useState(false);
+  const [mcPage,setMcPage]=useState(null);
+  const [mcSubs,setMcSubs]=useState([]); // subscriber list
+  const [mcSelSub,setMcSelSub]=useState(null); // selected subscriber detail
+  const [mcFlows,setMcFlows]=useState([]);
+  const [mcTags,setMcTags]=useState([]);
+  const [mcLoading,setMcLoading]=useState(false);
+  const [mcErr,setMcErr]=useState("");
+  const [mcMsgText,setMcMsgText]=useState("");
+  const [mcSending,setMcSending]=useState(false);
+  const [mcSent,setMcSent]=useState(false);
+  const [mcSearch,setMcSearch]=useState("");
+  const [mcShowSettings,setMcShowSettings]=useState(false);
   // Calendar
   const [calV,setCalV]=useState("list");
   const [calW,setCalW]=useState(new Date(2026,3,6));
@@ -684,6 +699,82 @@ export default function App(){
   };
 
 
+  // ═══ MANYCHAT API HELPERS ═══
+  const mcApi=async(action,params={},body=null)=>{
+    const qs=new URLSearchParams({action,...params}).toString();
+    const opts={headers:{"X-MC-Key":mcKey,"Content-Type":"application/json"}};
+    if(body){opts.method="POST";opts.body=JSON.stringify(body);}
+    else{opts.method="GET";}
+    const r=await fetch(`/api/manychat?${qs}`,opts);
+    return r.json();
+  };
+
+  const mcConnect=async()=>{
+    if(!mcKey.trim()){setMcErr("Enter your ManyChat API key first.");return;}
+    setMcLoading(true);setMcErr("");
+    try{
+      localStorage.setItem("mc_key",mcKey);
+      const pg=await mcApi("page_info");
+      if(pg.status==="error"){setMcErr(pg.message||"Invalid API key.");setMcConnected(false);setMcLoading(false);return;}
+      setMcPage(pg.data||pg);setMcConnected(true);
+      // Load tags & flows in parallel
+      const [tags,flows]=await Promise.all([mcApi("get_tags"),mcApi("get_flows")]);
+      setMcTags(tags.data||[]);setMcFlows(flows.data||[]);
+      setMcShowSettings(false);
+    }catch(e){setMcErr("Connection failed: "+e.message);}
+    setMcLoading(false);
+  };
+
+  const mcDisconnect=()=>{
+    setMcConnected(false);setMcPage(null);setMcSubs([]);setMcSelSub(null);
+    setMcFlows([]);setMcTags([]);localStorage.removeItem("mc_key");setMcKey("");
+  };
+
+  const mcSearchSubs=async(name)=>{
+    if(!name.trim()||!mcConnected)return;
+    setMcLoading(true);
+    try{
+      const r=await mcApi("find_by_name",{name});
+      setMcSubs(r.data||[]);
+    }catch(e){setMcErr(e.message);}
+    setMcLoading(false);
+  };
+
+  const mcLoadSub=async(subId)=>{
+    setMcLoading(true);
+    try{
+      const r=await mcApi("subscriber_info",{subscriber_id:subId});
+      setMcSelSub(r.data||r);
+    }catch(e){setMcErr(e.message);}
+    setMcLoading(false);
+  };
+
+  const mcSendText=async()=>{
+    if(!mcMsgText.trim()||!mcSelSub)return;
+    setMcSending(true);
+    try{
+      await mcApi("send_text",{},{subscriber_id:mcSelSub.id,text:mcMsgText});
+      setMcSent(true);setMcMsgText("");
+      setTimeout(()=>setMcSent(false),2500);
+    }catch(e){setMcErr(e.message);}
+    setMcSending(false);
+  };
+
+  const mcTriggerFlow=async(flowNs)=>{
+    if(!mcSelSub)return;
+    try{
+      await mcApi("send_flow",{},{subscriber_id:mcSelSub.id,flow_ns:flowNs});
+    }catch(e){setMcErr(e.message);}
+  };
+
+  const mcAddTag=async(tagName)=>{
+    if(!mcSelSub)return;
+    try{
+      await mcApi("add_tag",{},{subscriber_id:mcSelSub.id,tag_name:tagName});
+      mcLoadSub(mcSelSub.id); // refresh
+    }catch(e){setMcErr(e.message);}
+  };
+
   // DM / AI
   const callAI=async(msgs)=>{try{const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,system:AI_SYS,messages:msgs.map(m=>({role:m.from==="them"?"user":"assistant",content:m.text}))})});const d=await r.json();return d.content?.filter(b=>b.type==="text").map(b=>b.text).join("\n")||"Thanks for reaching out — I'll follow up shortly.";}catch{return"Thanks for reaching out — I'll get back to you with details shortly.";}};
 
@@ -719,7 +810,7 @@ export default function App(){
   // ─── NAV ──────────────────────────────────────────────────────────
   const nav=[
     {section:"Overview",items:[{k:"dashboard",icon:"grid",l:"Dashboard"},{k:"pipeline",icon:"pipe",l:"Pipeline",bd:leads.length}]},
-    {section:"Inbound",items:[{k:"dm",icon:"chat",l:"Meta DMs",red:unread>0},{k:"forms",icon:"form",l:"Form Captures",red:newForms>0},{k:"calendar",icon:"cal",l:"Call Calendar",bd:upBk.length}]},
+    {section:"Inbound",items:[{k:"dm",icon:"chat",l:"Meta DMs",red:unread>0},{k:"manychat",icon:"zap",l:"ManyChat",red:mcConnected},{k:"forms",icon:"form",l:"Form Captures",red:newForms>0},{k:"calendar",icon:"cal",l:"Call Calendar",bd:upBk.length}]},
     {section:"Outbound",items:[{k:"scraper",icon:"search",l:"Lead Scraper"},{k:"leads",icon:"users",l:"All Leads",bd:leads.length},{k:"outreach",icon:"mail",l:"Outreach"}]},
   ];
 
@@ -792,6 +883,139 @@ export default function App(){
               </>):<div className="ch-e"><div style={{fontSize:40,opacity:.2}}>💬</div><div style={{fontSize:12}}>Select a conversation</div></div>}
             </div>
           </div>
+        </>)}
+
+        {/* ══════════ MANYCHAT ══════════ */}
+        {v==="manychat"&&(<>
+          <div className="ph">
+            <div><div className="pt">ManyChat <span style={{fontSize:11,color:mcConnected?"var(--ok)":"var(--t3)",fontWeight:400}}>{mcConnected?"● Connected":"○ Not connected"}</span></div><div className="ps">Instagram DM inbox, subscriber management & automation</div></div>
+            <button className="btn btn-s" onClick={()=>setMcShowSettings(!mcShowSettings)}>⚙ Settings</button>
+          </div>
+
+          {/* SETTINGS PANEL */}
+          {mcShowSettings&&(<div className="sp" style={{border:"1px solid var(--ac)",borderRadius:"var(--rl)"}}>
+            <div style={{fontSize:13,fontWeight:700,marginBottom:8}}>ManyChat API Configuration</div>
+            <div style={{fontSize:11,color:"var(--t3)",marginBottom:12}}>Enter your ManyChat API key from Settings → Integrations → API in your ManyChat dashboard</div>
+            <div style={{display:"flex",gap:8,alignItems:"flex-end",marginBottom:10}}>
+              <div style={{flex:1}}>
+                <div style={{fontSize:10,color:"var(--t3)",marginBottom:3}}>API Key</div>
+                <input className="si" type="password" placeholder="Paste your ManyChat API key…" value={mcKey} onChange={e=>setMcKey(e.target.value)} style={{width:"100%"}}/>
+              </div>
+              {!mcConnected?<button className="btn btn-p" onClick={mcConnect} disabled={mcLoading}>{mcLoading?"Connecting…":"Connect"}</button>
+              :<button className="btn btn-s" onClick={mcDisconnect} style={{color:"var(--no)"}}>Disconnect</button>}
+            </div>
+            {mcErr&&<div style={{fontSize:11,color:"var(--no)",marginBottom:8}}>{mcErr}</div>}
+            {mcConnected&&mcPage&&<div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+              <span className="tag" style={{background:"rgba(52,211,153,.12)",color:"var(--ok)"}}>✓ Connected to: {mcPage.name||"ManyChat Page"}</span>
+              <span className="tag" style={{background:"var(--s3)",color:"var(--t2)"}}>{mcTags.length} tags loaded</span>
+              <span className="tag" style={{background:"var(--s3)",color:"var(--t2)"}}>{mcFlows.length} flows loaded</span>
+            </div>}
+          </div>)}
+
+          {/* NOT CONNECTED STATE */}
+          {!mcConnected&&!mcShowSettings&&(<div className="sp" style={{textAlign:"center",padding:"40px 20px"}}>
+            <div style={{fontSize:40,marginBottom:10,opacity:.3}}>⚡</div>
+            <div style={{fontSize:14,fontWeight:600,marginBottom:6}}>Connect ManyChat</div>
+            <div style={{fontSize:12,color:"var(--t3)",marginBottom:16,maxWidth:400,margin:"0 auto 16px"}}>Link your ManyChat account to manage Instagram DM subscribers, send messages, and trigger automation flows directly from LeadFlow.</div>
+            <button className="btn btn-p" onClick={()=>setMcShowSettings(true)}>⚙ Configure API Key</button>
+          </div>)}
+
+          {/* CONNECTED — SUBSCRIBER INBOX */}
+          {mcConnected&&(<>
+            {/* Search bar */}
+            <div className="sp" style={{paddingBottom:10}}>
+              <div style={{display:"flex",gap:8,alignItems:"center"}}>
+                <input className="si" placeholder="Search subscribers by name…" value={mcSearch} onChange={e=>setMcSearch(e.target.value)} style={{flex:1}} onKeyDown={e=>e.key==="Enter"&&mcSearchSubs(mcSearch)}/>
+                <button className="btn btn-p" onClick={()=>mcSearchSubs(mcSearch)} disabled={mcLoading}>{mcLoading?"Searching…":"Search"}</button>
+              </div>
+            </div>
+
+            <div style={{display:"flex",gap:12,minHeight:400}}>
+              {/* LEFT: Subscriber list */}
+              <div style={{width:280,flexShrink:0}}>
+                {mcSubs.length>0?mcSubs.map(sub=>(
+                  <div key={sub.id} className={`ni ${mcSelSub?.id===sub.id?"a":""}`} onClick={()=>mcLoadSub(sub.id)} style={{padding:"10px 12px",marginBottom:4,borderRadius:"var(--r)",background:mcSelSub?.id===sub.id?"var(--acd)":"var(--s1)",border:"1px solid "+(mcSelSub?.id===sub.id?"var(--acb)":"var(--b)"),cursor:"pointer"}}>
+                    <div style={{display:"flex",alignItems:"center",gap:8}}>
+                      <div style={{width:32,height:32,borderRadius:"50%",background:"var(--s3)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:14}}>{sub.first_name?sub.first_name[0]:"?"}</div>
+                      <div>
+                        <div style={{fontSize:12,fontWeight:600}}>{sub.first_name} {sub.last_name}</div>
+                        <div style={{fontSize:10,color:"var(--t3)"}}>{sub.status||"subscriber"}</div>
+                      </div>
+                    </div>
+                  </div>
+                )):<div style={{padding:20,textAlign:"center",color:"var(--t3)",fontSize:11}}>{mcSubs.length===0?"Search for subscribers above":"No subscribers found"}</div>}
+              </div>
+
+              {/* RIGHT: Subscriber detail + actions */}
+              <div style={{flex:1}}>
+                {mcSelSub?(<div className="sp">
+                  {/* Header */}
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:16}}>
+                    <div>
+                      <div style={{fontSize:16,fontWeight:700}}>{mcSelSub.first_name} {mcSelSub.last_name}</div>
+                      <div style={{fontSize:11,color:"var(--t3)",marginTop:2}}>ID: {mcSelSub.id} · {mcSelSub.ig_username?"@"+mcSelSub.ig_username:""}</div>
+                    </div>
+                    <div style={{display:"flex",gap:4}}>
+                      <span className="tag" style={{background:mcSelSub.live_chat_url?"rgba(52,211,153,.12)":"var(--s3)",color:mcSelSub.live_chat_url?"var(--ok)":"var(--t3)"}}>{mcSelSub.status||"Active"}</span>
+                    </div>
+                  </div>
+
+                  {/* Info grid */}
+                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:16}}>
+                    {mcSelSub.email&&<div style={{background:"var(--s2)",borderRadius:"var(--r)",padding:"8px 10px"}}><div style={{fontSize:9,color:"var(--t3)",textTransform:"uppercase",letterSpacing:1}}>Email</div><div style={{fontSize:12}}>{mcSelSub.email}</div></div>}
+                    {mcSelSub.phone&&<div style={{background:"var(--s2)",borderRadius:"var(--r)",padding:"8px 10px"}}><div style={{fontSize:9,color:"var(--t3)",textTransform:"uppercase",letterSpacing:1}}>Phone</div><div style={{fontSize:12}}>{mcSelSub.phone}</div></div>}
+                    {mcSelSub.ig_username&&<div style={{background:"var(--s2)",borderRadius:"var(--r)",padding:"8px 10px"}}><div style={{fontSize:9,color:"var(--t3)",textTransform:"uppercase",letterSpacing:1}}>Instagram</div><div style={{fontSize:12}}>@{mcSelSub.ig_username}</div></div>}
+                    {mcSelSub.last_interaction&&<div style={{background:"var(--s2)",borderRadius:"var(--r)",padding:"8px 10px"}}><div style={{fontSize:9,color:"var(--t3)",textTransform:"uppercase",letterSpacing:1}}>Last Interaction</div><div style={{fontSize:12}}>{new Date(mcSelSub.last_interaction).toLocaleDateString()}</div></div>}
+                  </div>
+
+                  {/* Tags */}
+                  {mcSelSub.tags&&mcSelSub.tags.length>0&&<div style={{marginBottom:16}}>
+                    <div style={{fontSize:10,color:"var(--t3)",textTransform:"uppercase",letterSpacing:1,marginBottom:6}}>Tags</div>
+                    <div style={{display:"flex",gap:4,flexWrap:"wrap"}}>{mcSelSub.tags.map(t=><span key={t.id} className="tag" style={{background:"var(--acd)",color:"var(--ac)"}}>{t.name}</span>)}</div>
+                  </div>}
+
+                  {/* Custom fields */}
+                  {mcSelSub.custom_fields&&mcSelSub.custom_fields.length>0&&<div style={{marginBottom:16}}>
+                    <div style={{fontSize:10,color:"var(--t3)",textTransform:"uppercase",letterSpacing:1,marginBottom:6}}>Custom Fields</div>
+                    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>{mcSelSub.custom_fields.filter(f=>f.value).map(f=><div key={f.id} style={{background:"var(--s2)",borderRadius:"var(--r)",padding:"6px 10px"}}><div style={{fontSize:9,color:"var(--t3)"}}>{f.name}</div><div style={{fontSize:11}}>{String(f.value)}</div></div>)}</div>
+                  </div>}
+
+                  {/* ─── SEND MESSAGE ─── */}
+                  <div style={{borderTop:"1px solid var(--b)",paddingTop:14,marginTop:8}}>
+                    <div style={{fontSize:12,fontWeight:700,marginBottom:8}}>Send Instagram Message</div>
+                    <div style={{fontSize:10,color:"var(--t3)",marginBottom:8}}>Note: only works within 24hr of subscriber's last interaction</div>
+                    <div style={{display:"flex",gap:6}}>
+                      <textarea className="si" rows={2} placeholder="Type your message…" value={mcMsgText} onChange={e=>setMcMsgText(e.target.value)} style={{flex:1,resize:"vertical"}}/>
+                      <button className="btn btn-p" onClick={mcSendText} disabled={mcSending||!mcMsgText.trim()} style={{alignSelf:"flex-end"}}>{mcSending?"Sending…":mcSent?"Sent ✓":"Send"}</button>
+                    </div>
+                  </div>
+
+                  {/* ─── TRIGGER FLOW ─── */}
+                  {mcFlows.length>0&&<div style={{borderTop:"1px solid var(--b)",paddingTop:14,marginTop:14}}>
+                    <div style={{fontSize:12,fontWeight:700,marginBottom:8}}>Trigger Automation Flow</div>
+                    <div style={{display:"flex",gap:4,flexWrap:"wrap"}}>{mcFlows.map(f=><button key={f.ns} className="btn btn-s" onClick={()=>mcTriggerFlow(f.ns)}><X t="zap" s={10}/> {f.name}</button>)}</div>
+                  </div>}
+
+                  {/* ─── ADD TAG ─── */}
+                  {mcTags.length>0&&<div style={{borderTop:"1px solid var(--b)",paddingTop:14,marginTop:14}}>
+                    <div style={{fontSize:12,fontWeight:700,marginBottom:8}}>Add Tag</div>
+                    <div style={{display:"flex",gap:4,flexWrap:"wrap"}}>{mcTags.filter(t=>!mcSelSub.tags?.some(st=>st.id===t.id)).slice(0,12).map(t=><button key={t.id} className="btn btn-s" onClick={()=>mcAddTag(t.name)}>+ {t.name}</button>)}</div>
+                  </div>}
+
+                  {/* ─── IMPORT TO LEADFLOW ─── */}
+                  <div style={{borderTop:"1px solid var(--b)",paddingTop:14,marginTop:14}}>
+                    <button className="btn btn-p" onClick={()=>{
+                      if(leads.some(l=>l.name===`${mcSelSub.first_name} ${mcSelSub.last_name}`))return;
+                      setLeads(p=>[...p,{id:Date.now(),name:`${mcSelSub.first_name} ${mcSelSub.last_name}`,company:mcSelSub.ig_username?"@"+mcSelSub.ig_username:"ManyChat",email:mcSelSub.email||"",phone:mcSelSub.phone||"",source:"ig_dm",category:"music_video",stage:"cold",notes:`ManyChat subscriber. ${mcSelSub.ig_username?"IG: @"+mcSelSub.ig_username:""}`,lastContact:mcSelSub.last_interaction?mcSelSub.last_interaction.slice(0,10):null,created:new Date().toISOString().slice(0,10)}]);
+                    }} disabled={leads.some(l=>l.name===`${mcSelSub.first_name} ${mcSelSub.last_name}`)}>{leads.some(l=>l.name===`${mcSelSub.first_name} ${mcSelSub.last_name}`)?"Already in Pipeline ✓":"Import to LeadFlow Pipeline"}</button>
+                  </div>
+                </div>):<div className="sp" style={{textAlign:"center",padding:"40px 20px",color:"var(--t3)"}}>
+                  <div style={{fontSize:30,marginBottom:8,opacity:.3}}>👤</div>
+                  <div style={{fontSize:12}}>Search and select a subscriber to view details, send messages, and manage tags</div>
+                </div>}
+              </div>
+            </div>
+          </>)}
         </>)}
 
         {/* ══════════ AUTOMATION FLOWS ══════════ */}
