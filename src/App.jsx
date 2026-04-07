@@ -176,32 +176,34 @@ const SCRAPE_DB={
 
 // Format scrape results for display based on source type
 const fmtScrapeResult=(src,r)=>{
+  if(!r||!r.name)return{name:"Unknown",detail:"—",...r};
   if(src==="google_maps"){
-    const parts=[r.type,`${r.rating}★ (${r.reviews})`,r.area];
-    if(!r.hasSocial)parts.push("No social");
+    const parts=[r.type||"Business",r.rating?`${r.rating}★ (${r.reviews||0})`:"",r.area].filter(Boolean);
+    if(r.hasSocial===false)parts.push("No social");
     return{...r,detail:parts.join(" · ")};
   }
   if(src==="instagram"){
-    const parts=[r.handle,`${r.followers}K`,r.genre||r.contentType.replace("_"," ")];
+    const parts=[r.handle||"",r.followers?`${r.followers}K`:"",r.genre||(r.contentType?r.contentType.replace("_"," "):"")].filter(Boolean);
     if(r.verified)parts.push("Verified ✓");
     if(r.engagement==="high")parts.push("High engagement");
-    return{...r,detail:parts.join(" · ")};
+    return{...r,detail:parts.join(" · ")||r.snippet||r.name};
   }
   if(src==="linkedin"){
-    return{...r,detail:`${r.role} at ${r.company} · ${r.industry} · ${r.companySize} employees`};
+    const parts=[r.role?`${r.role}`:"",r.company?`at ${r.company}`:"",r.industry||"",r.companySize?`${r.companySize} employees`:""].filter(Boolean);
+    return{...r,detail:parts.join(" · ")||r.snippet||r.name};
   }
   if(src==="tiktok"){
-    const parts=[r.handle,`${r.followers}K followers`,`~${r.avgViews}K avg views`];
+    const parts=[r.handle||"",r.followers?`${r.followers}K followers`:"",r.avgViews?`~${r.avgViews}K avg views`:""].filter(Boolean);
     if(r.genre)parts.push(r.genre);
     if(r.verified)parts.push("Verified ✓");
-    return{...r,detail:parts.join(" · ")};
+    return{...r,detail:parts.join(" · ")||r.snippet||r.name};
   }
   if(src==="yelp"){
-    const parts=[r.type,`${r.rating}★ (${r.reviews})`,r.area,"$".repeat(r.priceLevel)];
-    if(!r.claimed)parts.push("Unclaimed");
+    const parts=[r.type||"Business",r.rating?`${r.rating}★ (${r.reviews||0})`:"",r.area,r.priceLevel?"$".repeat(r.priceLevel):""].filter(Boolean);
+    if(r.claimed===false)parts.push("Unclaimed");
     return{...r,detail:parts.join(" · ")};
   }
-  return r;
+  return{...r,detail:r.detail||r.snippet||r.name};
 };
 
 // Source-specific filter definitions — controls what UI shows for each source
@@ -691,7 +693,7 @@ export default function App(){
           const url=`/api/scrape-google?query=${encodeURIComponent(q)}&minRating=${scFilters.rating?parseFloat(scFilters.rating):0}&maxResults=20`;
           apiRes=await fetch(url,{headers:{"X-API-Key":scKeys.google}});
         }else if(scSrc==="yelp"){
-          const term=scQuery||scFilters.bizType==="retail"?"vintage stores":scFilters.bizType==="restaurant"?"restaurants":"businesses";
+          const term=scQuery||(scFilters.bizType==="retail"?"vintage stores":scFilters.bizType==="restaurant"?"restaurants":"businesses");
           const loc=scFilters.area&&scFilters.area!=="all"?`${scFilters.area}, Los Angeles, CA`:"Los Angeles, CA";
           const price=scFilters.priceLevel&&scFilters.priceLevel!=="all"?scFilters.priceLevel:"";
           const url=`/api/scrape-yelp?term=${encodeURIComponent(scQuery||term)}&location=${encodeURIComponent(loc)}&limit=20${price?`&price=${price}`:""}`;
@@ -708,10 +710,11 @@ export default function App(){
           results.forEach((r,i)=>{setTimeout(()=>{setScanRes(p=>[...p,r]);if(i===results.length-1)setTimeout(()=>setScanning(null),500);},300*(i+1));});
           return;
         }else{
-          const err=apiRes?await apiRes.json().catch(()=>({})):{};
-          console.warn("API error, falling back to mock data:",err);
+          const errData=apiRes?await apiRes.json().catch(()=>({})):{};
+          console.warn("API error (status "+apiRes?.status+"), falling back to mock data:",errData);
+          setScanRes([{name:"⚠ API Error",detail:`Status ${apiRes?.status}: ${errData.error||"Unknown error"} — showing mock data below`,_apiError:true}]);
         }
-      }catch(e){console.warn("API call failed, falling back to mock:",e);}
+      }catch(e){console.warn("API call failed, falling back to mock:",e);setScanRes([{name:"⚠ Connection Error",detail:`${e.message} — showing mock data below`,_apiError:true}]);}
     }
     // ── Mock data fallback ──
     const results=filterScrapeDB(scSrc,scFilters);
@@ -1102,31 +1105,32 @@ export default function App(){
 
         {/* ══════════ SCRAPER ══════════ */}
         {v==="scraper"&&(<>
-          <div className="ph"><div><div className="pt">Lead Scraper</div><div className="ps">{scKeys.google||scKeys.yelp?"Live data from real APIs":"Choose a source, set your filters, then scan"}</div></div><button className="btn btn-s" onClick={()=>setScShowKeys(p=>!p)}>⚙ API Keys</button></div>
+          <div className="ph"><div><div className="pt">Lead Scraper</div><div className="ps">{scKeys.google||scKeys.yelp?"Live data from real APIs":"Choose a source, set your filters, then scan"}</div></div><button className={`btn ${scShowKeys?"btn-p":"btn-s"}`} onClick={()=>setScShowKeys(p=>!p)}>{scShowKeys?"✕ Close":"⚙ API Keys"}{!scKeys.google&&!scKeys.yelp?" (setup required)":""}</button></div>
 
           {/* API KEY SETTINGS PANEL */}
           {scShowKeys&&<div className="sp" style={{borderLeft:"3px solid var(--ac)"}}>
-            <div style={{fontSize:13,fontWeight:700,marginBottom:8}}>API Key Configuration</div>
-            <div style={{fontSize:11,color:"var(--t3)",marginBottom:12}}>Add free API keys to pull real data. Without keys, mock data is used as a preview.</div>
+            <div style={{fontSize:13,fontWeight:700,marginBottom:4}}>API Key Configuration</div>
+            <div style={{fontSize:11,color:"var(--t3)",marginBottom:12}}>Enter your keys once — they auto-save to this browser and work across all sources.</div>
             <div style={{display:"flex",flexDirection:"column",gap:10}}>
               <div>
-                <label style={{fontSize:11,fontWeight:600,display:"block",marginBottom:3}}>Google API Key <span style={{color:"var(--t3)",fontWeight:400}}>(Places + Custom Search — free $200/mo)</span></label>
+                <label style={{fontSize:11,fontWeight:600,display:"block",marginBottom:3}}>Google API Key <span style={{color:"var(--t3)",fontWeight:400}}>(Powers: Google Maps + Instagram/TikTok/LinkedIn — free $200/mo)</span></label>
                 <input className="si" style={{width:"100%"}} placeholder="AIzaSy..." value={scKeys.google} onChange={e=>setScKey("google",e.target.value)}/>
               </div>
               <div>
-                <label style={{fontSize:11,fontWeight:600,display:"block",marginBottom:3}}>Google CSE ID <span style={{color:"var(--t3)",fontWeight:400}}>(for Instagram/TikTok/LinkedIn search)</span></label>
+                <label style={{fontSize:11,fontWeight:600,display:"block",marginBottom:3}}>Google CSE ID <span style={{color:"var(--t3)",fontWeight:400}}>(Powers: Instagram/TikTok/LinkedIn social search)</span></label>
                 <input className="si" style={{width:"100%"}} placeholder="Custom Search Engine ID" value={scKeys.cseId} onChange={e=>setScKey("cseId",e.target.value)}/>
               </div>
               <div>
-                <label style={{fontSize:11,fontWeight:600,display:"block",marginBottom:3}}>Yelp Fusion API Key <span style={{color:"var(--t3)",fontWeight:400}}>(free 500 calls/day)</span></label>
+                <label style={{fontSize:11,fontWeight:600,display:"block",marginBottom:3}}>Yelp Fusion API Key <span style={{color:"var(--t3)",fontWeight:400}}>(Powers: Yelp — free 500 calls/day)</span></label>
                 <input className="si" style={{width:"100%"}} placeholder="Bearer token from Yelp" value={scKeys.yelp} onChange={e=>setScKey("yelp",e.target.value)}/>
               </div>
             </div>
-            <div style={{marginTop:10,display:"flex",gap:6,flexWrap:"wrap"}}>
+            <div style={{marginTop:10,display:"flex",gap:6,flexWrap:"wrap",alignItems:"center"}}>
               {scKeys.google&&<span className="tag" style={{background:"rgba(52,211,153,.12)",color:"var(--ok)"}}>✓ Google Maps</span>}
               {scKeys.yelp&&<span className="tag" style={{background:"rgba(52,211,153,.12)",color:"var(--ok)"}}>✓ Yelp</span>}
               {scKeys.google&&scKeys.cseId&&<span className="tag" style={{background:"rgba(52,211,153,.12)",color:"var(--ok)"}}>✓ Instagram / TikTok / LinkedIn</span>}
               {!scKeys.google&&!scKeys.yelp&&<span className="tag" style={{background:"rgba(248,113,113,.12)",color:"var(--no)"}}>No keys — using mock data</span>}
+              {(scKeys.google||scKeys.yelp)&&<button className="btn btn-p btn-s" onClick={()=>setScShowKeys(false)} style={{marginLeft:"auto"}}>✓ Done</button>}
             </div>
           </div>}
 
@@ -1134,7 +1138,7 @@ export default function App(){
           <div className="sp">
             <div style={{fontSize:13,fontWeight:700,marginBottom:2}}>1. Select a Source</div>
             <div style={{fontSize:10.5,color:"var(--t3)",marginBottom:10}}>Each source has its own set of filters</div>
-            <div className="sp-grid">{[{k:"google_maps",i:"📍",n:"Google Maps",d:"Local businesses"},{k:"instagram",i:"📸",n:"Instagram",d:"Artists & brands"},{k:"linkedin",i:"💼",n:"LinkedIn",d:"Decision makers"},{k:"tiktok",i:"🎵",n:"TikTok",d:"Viral creators"},{k:"yelp",i:"⭐",n:"Yelp",d:"Restaurants & retail"}].map(s=><div key={s.k} className={`sp-c ${scSrc===s.k?"sp-c-active":""}`} onClick={()=>selectScSource(s.k)}><div className="sc-i">{s.i}</div><div className="sc-n">{s.n}</div><div className="sc-d">{s.d}</div></div>)}</div>
+            <div className="sp-grid">{[{k:"google_maps",i:"📍",n:"Google Maps",d:"Local businesses"},{k:"instagram",i:"📸",n:"Instagram",d:"Artists & brands"},{k:"linkedin",i:"💼",n:"LinkedIn",d:"Decision makers"},{k:"tiktok",i:"🎵",n:"TikTok",d:"Viral creators"},{k:"yelp",i:"⭐",n:"Yelp",d:"Restaurants & retail"}].map(s=><div key={s.k} className={`sp-c ${scSrc===s.k?"sp-c-active":""}`} onClick={()=>selectScSource(s.k)}><div className="sc-i">{s.i}</div><div className="sc-n">{s.n}</div><div className="sc-d">{s.d}</div>{hasApiKey(s.k)?<div style={{fontSize:8.5,color:"var(--ok)",fontWeight:700,marginTop:3}}>🟢 LIVE</div>:<div style={{fontSize:8.5,color:"var(--t3)",marginTop:3}}>Mock data</div>}</div>)}</div>
           </div>
 
           {/* STEP 2 — DYNAMIC FILTERS (shown after source selection) */}
